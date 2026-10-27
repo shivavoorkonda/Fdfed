@@ -6,14 +6,13 @@ const FILTERS = ['all', 'pending', 'approved', 'rejected'];
 const formatDate = (value) => value ? new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
 function ReviewModal({ request, type, onClose, onConfirm, saving }) {
-  const [tier, setTier] = useState('basic'); const [note, setNote] = useState('');
+  const [note, setNote] = useState('');
   const isReject = type === 'reject';
   return <div className="modal-backdrop open" onClick={onClose}><div className="modal" onClick={(event) => event.stopPropagation()}>
     <h3>{isReject ? 'Reject' : 'Approve'} — {request.collegeName}</h3>
     <p style={{ color: '#64748b', fontSize: 13, lineHeight: 1.5, margin: '8px 0 18px' }}>{isReject ? 'Provide a clear reason that will be retained with this request.' : `This creates the college and assigns ${request.contactName} as its college admin with the default password 123.`}</p>
-    {!isReject && <div className="form-group"><label>Subscription tier</label><select value={tier} onChange={(event) => setTier(event.target.value)}><option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div>}
     <div className="form-group"><label>Review note{isReject ? ' *' : ' (optional)'}</label><textarea rows={4} value={note} onChange={(event) => setNote(event.target.value)} placeholder={isReject ? 'Why is this request being rejected?' : 'Optional note for this approval'} /></div>
-    <div className="modal-actions"><button className="btn btn-outline" onClick={onClose}>Cancel</button><button className={`btn ${isReject ? 'btn-danger' : 'btn-primary'}`} disabled={saving || (isReject && !note.trim())} onClick={() => onConfirm({ tier, note: note.trim() })}>{saving ? 'Saving…' : isReject ? 'Reject request' : 'Approve & create college'}</button></div>
+    <div className="modal-actions"><button className="btn btn-outline" onClick={onClose}>Cancel</button><button className={`btn ${isReject ? 'btn-danger' : 'btn-primary'}`} disabled={saving || (isReject && !note.trim())} onClick={() => onConfirm({ note: note.trim() })}>{saving ? 'Saving…' : isReject ? 'Reject request' : 'Approve & create college'}</button></div>
   </div></div>;
 }
 
@@ -23,7 +22,7 @@ export default function OnboardingRequests({ platform, showToast }) {
   useEffect(() => { load(); }, []); // This view owns its own read-only request list.
   const counts = useMemo(() => ({ all: requests.length, pending: requests.filter((request) => request.status === 'pending').length, approved: requests.filter((request) => request.status === 'approved').length, rejected: requests.filter((request) => request.status === 'rejected').length }), [requests]);
   const visible = filter === 'all' ? requests : requests.filter((request) => request.status === filter);
-  const confirm = async ({ tier, note }) => { if (!review) return; setSaving(true); try { if (review.type === 'approve') await platform.approveOnboarding(review.request.id, { tier, ...(note ? { note } : {}) }); else await platform.rejectOnboarding(review.request.id, { note }); showToast(review.type === 'approve' ? 'College and college admin created.' : 'Onboarding request rejected.', 'success'); setReview(null); await load(); } catch (error) { showToast(errorMessage(error, 'Could not process this request.'), 'error'); } finally { setSaving(false); } };
+  const confirm = async ({ note }) => { if (!review) return; setSaving(true); try { if (review.type === 'approve') await platform.approveOnboarding(review.request.id, note ? { note } : {}); else await platform.rejectOnboarding(review.request.id, { note }); showToast(review.type === 'approve' ? 'College and college admin created.' : 'Onboarding request rejected.', 'success'); setReview(null); await load(); } catch (error) { showToast(errorMessage(error, 'Could not process this request.'), 'error'); } finally { setSaving(false); } };
   return <><div className="section-header"><div><h2>College Onboarding Requests</h2><p style={{ marginTop: 4, color: '#64748b', fontSize: 13 }}>Review college enquiries and provision their CareerNest workspace.</p></div></div>
     <div className="stats-grid" style={{ marginBottom: 22 }}>{[['pending', 'Pending', '#f59e0b'], ['approved', 'Approved', '#16a34a'], ['rejected', 'Rejected', '#dc2626'], ['all', 'Total requests', '#7c3aed']].map(([key, label, color]) => <button key={key} onClick={() => setFilter(key)} style={{ textAlign: 'left', border: filter === key ? `2px solid ${color}` : '1px solid #e2e8f0', background: '#fff', borderRadius: 12, padding: 16, cursor: 'pointer' }}><strong style={{ display: 'block', fontSize: 24, color }}>{counts[key]}</strong><span style={{ color: '#64748b', fontSize: 13 }}>{label}</span></button>)}</div>
     <div className="filter-tabs" style={{ marginBottom: 16 }}>{FILTERS.map((key) => <button key={key} className={`tab${filter === key ? ' active' : ''}`} onClick={() => setFilter(key)}>{key[0].toUpperCase() + key.slice(1)} ({counts[key]})</button>)}</div>

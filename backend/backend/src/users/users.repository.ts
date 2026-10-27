@@ -168,6 +168,8 @@ export class UsersRepository {
     { id: 103, name: 'Dr. Rajesh Nair', email: 'p@gmail.com', role: 'placement_officer', collegeId: 1, password: '123', department: 'Training & Placement Cell', status: 'active', avatar: 'RN', university: 'Indian Institute of Information Technology, Sri City', phone: '+91 98450 11122' },
     // ── Super Admin & College Admins ─────────────────────────────────────────
     { id: 200, name: 'Anil Prasad', email: 'superadmin@platform.com', role: 'super_admin', collegeId: null, password: '123', status: 'active', avatar: 'AP2' },
+    { id: 204, name: 'Rajesh Kumar', email: 'admin1@careernest.com', role: 'admin', collegeId: null, password: '123', status: 'active', avatar: 'RK', phone: '+91 9876543210', department: 'Platform Operations' },
+    { id: 205, name: 'Priya Sharma', email: 'admin2@careernest.com', role: 'admin', collegeId: null, password: '123', status: 'active', avatar: 'PS', phone: '+91 9876543211', department: 'Support & Content' },
     { id: 201, name: 'Dr. Ganesh Kumar', email: 'ca@iiit.in', role: 'college_admin', collegeId: 1, password: '123', status: 'active', avatar: 'GK', department: 'Administration', university: 'IIIT Sri City' },
     { id: 202, name: 'Dr. Priya Menon', email: 'ca@vit.in', role: 'college_admin', collegeId: 2, password: '123', status: 'active', avatar: 'PM2', department: 'Administration', university: 'VIT University' },
     { id: 203, name: 'Dr. Ramesh Sharma', email: 'ca@srm.in', role: 'college_admin', collegeId: 3, password: '123', status: 'active', avatar: 'RS', department: 'Administration', university: 'SRM Institute' },

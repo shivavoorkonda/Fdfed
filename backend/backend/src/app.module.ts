@@ -15,6 +15,9 @@ import { FeaturesModule } from './features/features.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { ActivityModule } from './activity/activity.module';
 import { ContactModule } from './contact/contact.module';
+import { SupportTicketsModule } from './support-tickets/support-tickets.module';
+import { WebsiteContentModule } from './website-content/website-content.module';
+import { PlatformAnnouncementsModule } from './platform-announcements/platform-announcements.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { SecurityMiddleware } from './common/middleware/security.middleware';
 import { FileUploadMiddleware } from './common/middleware/file-upload.middleware';
@@ -38,6 +41,9 @@ import { RolesGuard } from './common/guards/roles.guard';
     AnnouncementsModule,
     ActivityModule,
     ContactModule,
+    SupportTicketsModule,
+    WebsiteContentModule,
+    PlatformAnnouncementsModule,
   ],
   controllers: [AppController],
   // LogFileService is exported so it can be injected into the global

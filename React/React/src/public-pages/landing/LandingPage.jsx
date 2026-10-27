@@ -10,6 +10,7 @@ import Testimonials from "./components/Testimonals";
 import FAQ from "./components/FAQ";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
+import PlatformAnnouncements from "./components/PlatformAnnouncements";
 
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
@@ -22,6 +23,7 @@ function LandingContent() {
     <div className="cn-landing" data-theme={theme}>
       <Navbar />
       <main>
+        <PlatformAnnouncements />
         <Hero />
         <Stats />
         <Problem />

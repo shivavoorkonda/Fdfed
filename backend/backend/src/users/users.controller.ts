@@ -22,6 +22,8 @@ import { AuthSessionService } from '../common/auth/auth-session.service';
 
 /** Which roles each administrator may create / manage. */
 const MANAGEABLE: Record<string, string[]> = {
+  super_admin: ['admin'],
+  admin: ['college_admin'],
   placement_officer: ['candidate', 'alumni', 'recruiter'],
   college_admin: ['placement_officer'],
 };
@@ -64,13 +66,14 @@ export class UsersController {
     const target = this.usersService.findRaw(targetId);
     if (!target) return; // the service answers 404
     const allowed = MANAGEABLE[caller.role] ?? [];
-    if (!allowed.includes(target.role) || target.collegeId !== caller.collegeId) {
+    const managesAcrossColleges = caller.role === 'admin';
+    if (!allowed.includes(target.role) || (!managesAcrossColleges && target.collegeId !== caller.collegeId)) {
       throw new ForbiddenException('You are not allowed to change this account');
     }
   }
 
   @Get()
-  @Roles('placement_officer', 'college_admin', 'super_admin')
+  @Roles('placement_officer', 'college_admin', 'admin', 'super_admin')
   @ApiOperation({
     summary:
       'Get users — super_admin: all users; college_admin/placement_officer: scoped to their college',
@@ -84,7 +87,7 @@ export class UsersController {
     @Query('role') roleFilter?: string,
   ) {
     // super_admin sees everything
-    if (role === 'super_admin') {
+    if (role === 'super_admin' || role === 'admin') {
       return roleFilter ? this.usersService.findByRole(roleFilter) : this.usersService.findAll();
     }
     // college_admin and placement_officer are scoped to their college
@@ -169,7 +172,7 @@ export class UsersController {
   }
 
   @Post()
-  @Roles('placement_officer', 'college_admin', 'super_admin')
+  @Roles('placement_officer', 'college_admin', 'admin', 'super_admin')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'User created' })
@@ -179,7 +182,9 @@ export class UsersController {
       if (!(MANAGEABLE[caller.role] ?? []).includes(dto.role)) {
         throw new ForbiddenException(`A ${caller.role.replace('_', ' ')} cannot create ${dto.role.replace('_', ' ')} accounts`);
       }
-      collegeId = caller.collegeId ?? undefined;   // always the caller's own college
+      // Admins operate platform-wide and choose the college for a new
+      // college-admin account. Other administrators stay college-scoped.
+      if (caller.role !== 'admin') collegeId = caller.collegeId ?? undefined;
     }
     const created = this.usersService.create({ ...dto, collegeId });
     const college = created.collegeId ? this.colleges.findById(created.collegeId)?.name : undefined;
@@ -200,9 +205,17 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto, @CurrentUser() caller: RequestUser) {
     this.assertCanManage(caller, id);
-    // Nobody can promote, move or re-credential themselves through the profile form.
-    if (caller.role !== 'super_admin' && caller.userId === id) {
-      delete (dto as any).role; delete (dto as any).collegeId; delete (dto as any).status; delete (dto as any).password;
+    // Delegated administrators can maintain profiles and account status in
+    // their remit, but may never promote, move, or re-credential an account.
+    // Authorization above uses the target's current role, so stripping these
+    // fields here prevents a managed account from being escalated in the same
+    // request after it has passed the scope check.
+    if (caller.role !== 'super_admin') {
+      delete (dto as any).role;
+      delete (dto as any).collegeId;
+      delete (dto as any).password;
+      // Nobody may deactivate or otherwise alter their own account status.
+      if (caller.userId === id) delete (dto as any).status;
     }
     const before = this.usersService.findRaw(id);
     const updated = this.usersService.update(id, dto);
@@ -218,7 +231,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles('placement_officer', 'college_admin', 'super_admin')
+  @Roles('placement_officer', 'college_admin', 'admin', 'super_admin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a user' })
   @ApiParam({ name: 'id', type: Number })

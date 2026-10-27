@@ -9,6 +9,10 @@ import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import SignOutModal from './components/SignOutModal';
 import Messages from './pages/Messages';
+import AlumniNetwork from './pages/AlumniNetwork';
+import DriveCalendar from './pages/DriveCalendar';
+import SupportTickets from './pages/SupportTickets';
+import CollegeSettings from './pages/CollegeSettings';
 import api, { clearSession } from '../../services/api.js';
 import { usePlatformData } from '../../shared/context/PlatformDataContext.jsx';
 import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
@@ -24,15 +28,19 @@ function getTitle(tab) {
     case 'dashboard':     return 'College Dashboard';
     case 'officers':      return 'Placement Officers';
     case 'students':      return 'Students';
+    case 'alumni':        return 'Alumni Network';
     case 'announcements': return 'Announcements';
+    case 'calendar':      return 'Drive Calendar';
     case 'messages':      return 'Messages';
     case 'reports':       return 'Placement Reports';
+    case 'support':       return 'Support Tickets';
+    case 'settings':      return 'College Settings';
     case 'profile':       return 'My Profile';
     default:              return 'College Admin';
   }
 }
 
-const COLLEGE_ADMIN_TABS = ['dashboard', 'officers', 'students', 'announcements', 'messages', 'reports', 'profile'];
+const COLLEGE_ADMIN_TABS = ['dashboard', 'officers', 'students', 'alumni', 'announcements', 'calendar', 'reports', 'messages', 'support', 'settings', 'profile'];
 const COLLEGE_ADMIN_TAB_KEY = 'cn_active_college_admin_tab';
 
 export default function CollegeAdminApp() {
@@ -66,7 +74,8 @@ export default function CollegeAdminApp() {
   const collegeInfo = data.colleges.find(c => c.id === collegeId) || data.colleges[0] || { name: '' };
   const officers    = data.officersByCollege[collegeId]   || [];
   const students    = data.studentsByCollege[collegeId]   || [];
-  const alumniCount = (data.alumniByCollege[collegeId]    || []).length;
+  const alumni       = data.alumniByCollege[collegeId]    || [];
+  const alumniCount = alumni.length;
   const recruiterCount = (data.recruitersByCollege[collegeId] || []).length;
   const applications = data.applicationsByCollege?.[collegeId] || [];
   const placedStudentIds = new Set(
@@ -98,8 +107,10 @@ export default function CollegeAdminApp() {
   };
 
   const sharedProps = {
-    officers, students, platform, alumniCount, recruiterCount, applications,
+    officers, students, alumni, platform, alumniCount, recruiterCount, applications,
     placedCount, placedStudentIds,
+    collegeId,
+    collegeInfo,
     collegeName: collegeInfo.name,
     showToast,
     setActiveTab,
@@ -132,9 +143,13 @@ export default function CollegeAdminApp() {
             {activeTab === 'dashboard'     && <CADashboard     {...sharedProps} />}
             {activeTab === 'officers'      && <Officers        {...sharedProps} />}
             {activeTab === 'students'      && <Students        {...sharedProps} />}
+            {activeTab === 'alumni'        && <AlumniNetwork   {...sharedProps} />}
             {activeTab === 'announcements' && <Announcements   collegeName={collegeInfo.name} />}
+            {activeTab === 'calendar'      && <DriveCalendar   {...sharedProps} />}
             {activeTab === 'messages'      && <Messages        onSeen={markMessagesSeen} />}
             {activeTab === 'reports'       && <Reports         students={students} collegeName={collegeInfo.name} placedStudentIds={placedStudentIds} />}
+            {activeTab === 'support'       && <SupportTickets  {...sharedProps} />}
+            {activeTab === 'settings'      && <CollegeSettings {...sharedProps} />}
             {activeTab === 'profile'       && <Profile collegeName={collegeInfo.name} showToast={showToast} onProfileUpdated={setUser} />}
           </div>
         </div>

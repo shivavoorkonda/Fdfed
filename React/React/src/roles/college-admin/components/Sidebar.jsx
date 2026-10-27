@@ -1,16 +1,20 @@
 import React from 'react';
 import {
   LayoutDashboard, ShieldCheck, GraduationCap,
-  Megaphone, BarChart2, Building2, LogOut, Mail
+  Megaphone, BarChart2, Building2, LogOut, Mail, Users, CalendarDays, CircleHelp, Settings
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { id: 'dashboard',      label: 'Dashboard',           icon: LayoutDashboard },
   { id: 'officers',       label: 'Placement Officers',  icon: ShieldCheck },
   { id: 'students',       label: 'Students',            icon: GraduationCap },
+  { id: 'alumni',         label: 'Alumni Network',      icon: Users },
   { id: 'announcements',  label: 'Announcements',       icon: Megaphone },
-  { id: 'messages',       label: 'Messages',            icon: Mail },
+  { id: 'calendar',       label: 'Drive Calendar',      icon: CalendarDays },
   { id: 'reports',        label: 'Reports',             icon: BarChart2 },
+  { id: 'messages',       label: 'Messages',            icon: Mail },
+  { id: 'support',        label: 'Support',             icon: CircleHelp },
+  { id: 'settings',       label: 'College Settings',    icon: Settings },
 ];
 
 export default function CollegeAdminSidebar({ activeTab, setActiveTab, collegeName, onSignOut, unreadMessages = 0 }) {

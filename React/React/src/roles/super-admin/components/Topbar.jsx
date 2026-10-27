@@ -17,6 +17,7 @@ export default function Topbar({ title, userName, avatarInitials, onProfileClick
     <header className="topbar">
       <span className="topbar-title">{title}</span>
       <div className="topbar-right">
+        <span className="sa-observer-pill">Platform Admin</span>
         <span className="user-name">{userName}</span>
         <div className="sa-topbar-profile-wrapper" ref={dropdownRef}>
           <button

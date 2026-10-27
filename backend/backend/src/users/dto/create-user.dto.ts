@@ -12,9 +12,9 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: 'candidate',
-    enum: ['candidate', 'recruiter', 'alumni', 'placement_officer', 'college_admin', 'super_admin'],
+    enum: ['candidate', 'recruiter', 'alumni', 'placement_officer', 'college_admin', 'admin', 'super_admin'],
   })
-  @IsIn(['candidate', 'recruiter', 'alumni', 'placement_officer', 'college_admin', 'super_admin'])
+  @IsIn(['candidate', 'recruiter', 'alumni', 'placement_officer', 'college_admin', 'admin', 'super_admin'])
   role: string;
 
   @ApiPropertyOptional({ example: 1, description: 'College ID (null for super_admin)' })

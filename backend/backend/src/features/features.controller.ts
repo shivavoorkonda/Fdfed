@@ -11,7 +11,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { CollegesRepository } from '../colleges/colleges.repository';
 import { ActivityService } from '../activity/activity.service';
 
-/** Subscription plans no longer lock features: every college can use the whole toolset. */
+/** Every college can use the complete toolset. */
 function checkTier(college: any, _required: 'standard' | 'premium'): void {
   if (!college) throw new HttpException('College not found', HttpStatus.NOT_FOUND);
 }

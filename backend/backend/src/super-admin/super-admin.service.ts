@@ -53,77 +53,42 @@ export class SuperAdminService {
     };
   }
 
-  /**
-   * Revenue model — college subscriptions ONLY.
-   *
-   * Revenue streams:
-   *   ONLY: Monthly subscription fees per college (basic/standard/premium)
-   *
-   * NO recruiter drive fees. Recruiters are free partners.
-   *
-   * Formulas:
-   *   Basic MRR    = count(active basic colleges) × 15,000
-   *   Standard MRR = count(active standard colleges) × 30,000
-   *   Premium MRR  = count(active premium colleges) × 50,000
-   *   Total MRR    = Basic MRR + Standard MRR + Premium MRR
-   *   ARR          = Total MRR × 12
-   *   Avg/College  = Total MRR / count(active colleges)
-   */
-  getRevenueStats() {
-    const colleges = this.collegesRepo.findAll();
-    const active   = colleges.filter(c => c.status === 'active');
-
-    const byTier = {
-      premium:  active.filter(c => c.subscriptionTier === 'premium'),
-      standard: active.filter(c => c.subscriptionTier === 'standard'),
-      basic:    active.filter(c => c.subscriptionTier === 'basic'),
-    };
-
-    const premiumMRR  = byTier.premium.length  * 50000;
-    const standardMRR = byTier.standard.length * 30000;
-    const basicMRR    = byTier.basic.length    * 15000;
-    const totalMRR    = premiumMRR + standardMRR + basicMRR;
-    const totalARR    = totalMRR * 12;
-    const avgRevenue  = active.length > 0 ? Math.round(totalMRR / active.length) : 0;
-
-    // Top colleges by annual subscription revenue
-    const topColleges = [...active]
-      .map(c => ({
-        id:              c.id,
-        name:            c.name,
-        tier:            c.subscriptionTier,
-        monthlyRevenue:  c.subscriptionFee,
-        annualRevenue:   c.subscriptionFee * 12,
-      }))
-      .sort((a, b) => b.annualRevenue - a.annualRevenue)
-      .slice(0, 5);
-
-    return {
-      // MRR breakdown
-      totalMRR,
-      totalARR,
-      avgRevenuePerCollege: avgRevenue,
-      totalPayingColleges: active.length,
-      // Tier breakdown
-      tiers: {
-        premium:  { count: byTier.premium.length,  mrr: premiumMRR,  pricePerMonth: 50000, pct: totalMRR > 0 ? Math.round((premiumMRR  / totalMRR) * 100) : 0 },
-        standard: { count: byTier.standard.length, mrr: standardMRR, pricePerMonth: 30000, pct: totalMRR > 0 ? Math.round((standardMRR / totalMRR) * 100) : 0 },
-        basic:    { count: byTier.basic.length,    mrr: basicMRR,    pricePerMonth: 15000, pct: totalMRR > 0 ? Math.round((basicMRR    / totalMRR) * 100) : 0 },
-      },
-      // Top earning colleges
-      topColleges,
-    };
+  getPlatformAdmins(): Omit<User, 'password'>[] {
+    return this.usersRepo.findAll().filter((user) => user.role === 'admin').map(safeUser);
   }
 
-  /** Change a college's subscription tier (super_admin only) */
-  changeSubscriptionTier(collegeId: number, tier: 'basic' | 'standard' | 'premium') {
-    const priceMap: Record<string, number> = { basic: 15000, standard: 30000, premium: 50000 };
-    const updated = this.collegesRepo.update(collegeId, {
-      subscriptionTier: tier,
-      subscriptionFee:  priceMap[tier],
+  createPlatformAdmin(data: { name: string; email: string; department?: string; phone?: string; password?: string }): Omit<User, 'password'> {
+    if (this.usersRepo.findByEmail(data.email)) {
+      throw new ConflictException(`A user with email '${data.email}' already exists`);
+    }
+    const created = this.usersRepo.create({
+      name: data.name,
+      email: data.email,
+      role: 'admin',
+      collegeId: null,
+      department: data.department || 'Platform Operations',
+      phone: data.phone,
+      password: data.password || '123',
+      status: 'active',
+      avatar: data.name.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase(),
     });
-    if (!updated) throw new NotFoundException(`College ${collegeId} not found`);
-    return updated;
+    return safeUser(created);
+  }
+
+  updatePlatformAdmin(id: number, data: Partial<{ name: string; email: string; department: string; phone: string; password: string; status: string }>): Omit<User, 'password'> {
+    const current = this.usersRepo.findById(id);
+    if (!current || current.role !== 'admin') throw new NotFoundException(`Platform admin ${id} not found`);
+    if (data.email && data.email.toLowerCase() !== current.email.toLowerCase()) {
+      const duplicate = this.usersRepo.findByEmail(data.email);
+      if (duplicate) throw new ConflictException(`A user with email '${data.email}' already exists`);
+    }
+    return safeUser(this.usersRepo.update(id, data)!);
+  }
+
+  removePlatformAdmin(id: number): boolean {
+    const current = this.usersRepo.findById(id);
+    if (!current || current.role !== 'admin') throw new NotFoundException(`Platform admin ${id} not found`);
+    return this.usersRepo.remove(id);
   }
 
   /** All colleges with their college admin and stats */

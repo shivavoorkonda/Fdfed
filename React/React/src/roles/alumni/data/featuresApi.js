@@ -1,8 +1,6 @@
 import api from '../../../services/api.js';
 
-// Thin wrappers over the plan-gated /features endpoints used by the alumni screens.
-// Errors keep the server's message (it names the plan that is required) so the
-// screens can show their "upgrade" notices.
+// Thin wrappers over the /features endpoints used by the alumni screens.
 const unwrap = (request) => request.then((r) => r.data).catch((error) => {
   const message = error.response?.data?.message;
   const status = error.response?.status;

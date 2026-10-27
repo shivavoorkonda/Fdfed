@@ -61,6 +61,18 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
+    // Admins are the platform's operational role. They may use explicitly
+    // operational platform/college endpoints, but cannot impersonate
+    // candidate, recruiter, alumni, or placement-officer workflows. Do not
+    // treat a super_admin-only route as operational here: those observer-only
+    // endpoints intentionally remain exclusive to the Super Admin.
+    if (role === 'admin') {
+      const operationalRoles = ['admin', 'college_admin'];
+      if (requiredRoles.some((required) => operationalRoles.includes(required))) {
+        return true;
+      }
+    }
+
     if (!requiredRoles.includes(role)) {
       throw new ForbiddenException(
         `Role '${role}' is not authorized. Required: ${requiredRoles.join(' | ')}`,

@@ -1,4 +1,7 @@
-const testimonials = [
+import { useEffect, useState } from 'react';
+import api from '../../../services/api.js';
+
+const FALLBACK_TESTIMONIALS = [
   {
     rating: "★★★★★",
     text:
@@ -42,7 +45,47 @@ const testimonials = [
   },
 ];
 
+const TESTIMONIAL_GRADIENTS = [
+  'linear-gradient(135deg, #7c3aed, #a855f7)',
+  'linear-gradient(135deg, #2563eb, #38bdf8)',
+  'linear-gradient(135deg, #ec4899, #f472b6)',
+  'linear-gradient(135deg, #f97316, #fb923c)',
+];
+
+function initials(name = '') {
+  return name.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'CN';
+}
+
+function stars(rating) {
+  const value = Math.max(0, Math.min(5, Number(rating) || 0));
+  return '★'.repeat(value) + '☆'.repeat(5 - value);
+}
+
 function Testimonials() {
+  const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
+
+  useEffect(() => {
+    let mounted = true;
+    api.get('/website-content/testimonials')
+      .then(({ data }) => {
+        if (!mounted || !Array.isArray(data)) return;
+        setTestimonials(
+          data
+            .filter((testimonial) => testimonial.isActive !== false)
+            .map((testimonial, index) => ({
+              ...testimonial,
+              rating: stars(testimonial.rating),
+              initials: testimonial.avatar || initials(testimonial.name),
+              role: [testimonial.role, testimonial.college].filter(Boolean).join(' · '),
+              gradient: TESTIMONIAL_GRADIENTS[index % TESTIMONIAL_GRADIENTS.length],
+              featured: index === 1,
+            })),
+        );
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <section
       className="testimonials"

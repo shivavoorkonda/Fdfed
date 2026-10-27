@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, IsIn, Length, Matches, IsUrl } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsIn, IsInt, Length, Matches, IsUrl, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCollegeDto {
@@ -37,4 +37,10 @@ export class CreateCollegeDto {
   @IsOptional()
   @IsIn(['active', 'inactive', 'suspended'])
   status?: 'active' | 'inactive' | 'suspended';
+
+  @ApiPropertyOptional({ example: 500, description: 'Maximum number of students supported by the college workspace' })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  studentLimit?: number;
 }

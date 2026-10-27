@@ -42,11 +42,19 @@ const roles = [
     customGradient: "linear-gradient(135deg, #0ea5e9, #0284c7)",
   },
   {
+    role: "admin",
+    icon: "⚙️",
+    title: "Platform Admin",
+    description:
+      "Run platform operations across colleges, resolve support requests, manage content, and publish platform-wide updates.",
+    customGradient: "linear-gradient(135deg, #2563eb, #4f46e5)",
+  },
+  {
     role: "super_admin",
     icon: "👑",
     title: "Super Admin",
     description:
-      "Onboard colleges, manage subscriptions, monitor platform-wide revenue and placement statistics.",
+      "Onboard colleges, coordinate platform operations, and monitor placement statistics.",
     customGradient: "linear-gradient(135deg, #7c3aed, #5b21b6)",
   },
 ];

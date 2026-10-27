@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Put, Patch, Delete,
-  Param, Body, ParseIntPipe, UseGuards, HttpCode, HttpStatus,
+  Param, Body, ParseIntPipe, UseGuards, HttpCode, HttpStatus, ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiSecurity, ApiResponse } from '@nestjs/swagger';
 import { CollegesService } from './colleges.service';
@@ -9,6 +9,8 @@ import { UpdateCollegeDto } from './dto/update-college.dto';
 import { CollegeStatusDto } from './dto/college-status.dto';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { RequestUser } from '../common/guards/roles.guard';
 
 @ApiTags('Colleges')
 @ApiSecurity('x-role')
@@ -32,19 +34,6 @@ export class CollegesController {
     return this.service.findOne(id);
   }
 
-  /**
-   * Returns the college's subscription tier, pricing, allowed features, and locked features.
-   * All actor roles can call this — each actor dashboard uses it to render plan badge + locks.
-   * The college subscription belongs to the college, not the individual actor.
-   */
-  @Get(':id/subscription')
-  @Roles('super_admin', 'college_admin', 'placement_officer', 'candidate', 'recruiter', 'alumni')
-  @ApiOperation({ summary: 'Subscription plan + feature matrix for a college (all roles)' })
-  @ApiParam({ name: 'id', type: Number })
-  getSubscription(@Param('id', ParseIntPipe) id: number) {
-    return this.service.getSubscription(id);
-  }
-
   @Post()
   @Roles('super_admin')
   @ApiOperation({ summary: 'Create a new college (super_admin only)' })
@@ -61,6 +50,26 @@ export class CollegesController {
   @ApiBody({ type: UpdateCollegeDto })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCollegeDto) {
     return this.service.update(id, dto);
+  }
+
+  /**
+   * A college administrator can maintain public contact details for their
+   * own college only. Status, code and limits remain platform
+   * operations data and are deliberately excluded from this endpoint.
+   */
+  @Put(':id/settings')
+  @Roles('college_admin')
+  @ApiOperation({ summary: 'Update the signed-in college administrator\'s college profile' })
+  updateOwnSettings(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCollegeDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    if (user.collegeId !== id) {
+      throw new ForbiddenException('You can only update your own college profile');
+    }
+    const { name, email, phone, address, website } = dto;
+    return this.service.update(id, { name, email, phone, address, website });
   }
 
   @Patch(':id/status')

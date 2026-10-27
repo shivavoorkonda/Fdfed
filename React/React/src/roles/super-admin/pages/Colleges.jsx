@@ -47,8 +47,11 @@ function validateField(key, raw, existing = []) {
   }
 }
 
-function AddCollegeModal({ onClose, onSave, existing }) {
-  const [form, setForm] = useState({ name: '', code: '', email: '', phone: '', address: '', website: '' });
+function CollegeModal({ college, onClose, onSave, existing }) {
+  const [form, setForm] = useState(() => college ? ({
+    name: college.name || '', code: college.code || '', email: college.email || '',
+    phone: college.phone || '', address: college.address || '', website: college.website || '',
+  }) : ({ name: '', code: '', email: '', phone: '', address: '', website: '' }));
   const [touched, setTouched] = useState({});
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -72,7 +75,7 @@ function AddCollegeModal({ onClose, onSave, existing }) {
   return (
     <div className="modal-backdrop open">
       <div className="modal">
-        <h3><Building2 size={18} color="#7c3aed" /> Add New College</h3>
+        <h3><Building2 size={18} color="#7c3aed" /> {college ? 'Edit College' : 'Add New College'}</h3>
         {FIELD_META.map(({ key, label, required, placeholder, hint }) => (
           <div className="form-group" key={key}>
             <label>{label}{required ? ' *' : ''}</label>
@@ -92,7 +95,7 @@ function AddCollegeModal({ onClose, onSave, existing }) {
         {error && <p className="form-error">{error}</p>}
         <div className="modal-actions">
           <button className="btn btn-outline" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Creating…' : 'Create College'}</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : college ? 'Save changes' : 'Create College'}</button>
         </div>
       </div>
     </div>
@@ -125,6 +128,7 @@ function StatusModal({ college, onClose, onSave }) {
 export default function Colleges({ colleges, platform, showToast, setActiveTab, setAdminCollegeId }) {
   const [showAdd, setShowAdd]       = useState(false);
   const [statusTarget, setStatusTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
 
   const handleAddCollege = async (newCol) => {
     if (colleges.some((college) => college.code.toLowerCase() === newCol.code.toLowerCase())) {
@@ -147,6 +151,27 @@ export default function Colleges({ colleges, platform, showToast, setActiveTab, 
       showToast('College status updated.', 'success');
     } catch (error) {
       showToast(errorMessage(error, 'Could not update the status.'), 'error');
+    }
+  };
+
+  const handleUpdateCollege = async (college, changes) => {
+    try {
+      await platform.updateCollege(college.id, changes);
+      showToast('College updated successfully.', 'success');
+      return true;
+    } catch (error) {
+      showToast(errorMessage(error, 'Could not update the college.'), 'error');
+      return false;
+    }
+  };
+
+  const handleDeleteCollege = async (college) => {
+    if (!window.confirm(`Delete ${college.name}? This cannot be undone.`)) return;
+    try {
+      await platform.removeCollege(college.id);
+      showToast('College deleted.', 'success');
+    } catch (error) {
+      showToast(errorMessage(error, 'Could not delete the college.'), 'error');
     }
   };
 
@@ -223,6 +248,8 @@ export default function Colleges({ colleges, platform, showToast, setActiveTab, 
                   >
                     <ShieldCheck size={13} /> Admin
                   </button>
+                  <button className="btn btn-outline btn-sm" onClick={() => setEditTarget(c)}>Edit</button>
+                  <button className="btn btn-outline btn-sm" onClick={() => handleDeleteCollege(c)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -231,7 +258,10 @@ export default function Colleges({ colleges, platform, showToast, setActiveTab, 
       </div>
 
       {showAdd && (
-        <AddCollegeModal onClose={() => setShowAdd(false)} onSave={handleAddCollege} existing={colleges} />
+        <CollegeModal onClose={() => setShowAdd(false)} onSave={handleAddCollege} existing={colleges} />
+      )}
+      {editTarget && (
+        <CollegeModal college={editTarget} onClose={() => setEditTarget(null)} onSave={(changes) => handleUpdateCollege(editTarget, changes)} existing={colleges.filter((college) => college.id !== editTarget.id)} />
       )}
       {statusTarget && (
         <StatusModal

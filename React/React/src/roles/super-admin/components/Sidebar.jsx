@@ -1,15 +1,17 @@
 import React from 'react';
 import {
-  LayoutDashboard, Building2, UserCog, Activity, Crown, LogOut, MessageSquare, ClipboardList
+  LayoutDashboard, Building2, UserCog, Activity, Crown, LogOut, Ticket,
+  Users, BarChart3
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
-  { id: 'colleges',       label: 'Colleges',          icon: Building2 },
-  { id: 'college-admins', label: 'College Admins',    icon: UserCog },
-  { id: 'onboarding',     label: 'Onboarding',        icon: ClipboardList },
-  { id: 'messages',       label: 'Messages',          icon: MessageSquare },
-  { id: 'activity',       label: 'Activity Log',      icon: Activity },
+  { id: 'overview',  label: 'Overview',           icon: LayoutDashboard },
+  { id: 'colleges',  label: 'Colleges',           icon: Building2 },
+  { id: 'admins',    label: 'Admins',             icon: UserCog },
+  { id: 'users',     label: 'All Users',          icon: Users },
+  { id: 'analytics', label: 'Analytics',          icon: BarChart3 },
+  { id: 'support',   label: 'Support Audit',      icon: Ticket },
+  { id: 'activity',  label: 'Audit Trail',        icon: Activity },
 ];
 
 export default function SuperAdminSidebar({ activeTab, setActiveTab, onSignOut }) {
@@ -17,11 +19,7 @@ export default function SuperAdminSidebar({ activeTab, setActiveTab, onSignOut }
     <aside className="sidebar">
       <div className="sidebar-brand">
         <h2><Crown size={18} color="#a78bfa" /> CareerNest</h2>
-        <p>Super Admin Portal</p>
-      </div>
-
-      <div className="sidebar-role-badge">
-        <span>Super Administrator</span>
+        <p>Platform Administration</p>
       </div>
 
       <nav className="sidebar-nav">
@@ -39,7 +37,7 @@ export default function SuperAdminSidebar({ activeTab, setActiveTab, onSignOut }
 
       <div className="sidebar-bottom">
         <div className="sidebar-help-text">
-          As Super Admin, you manage all colleges and their administrators.
+          Full platform administration and organization management.
         </div>
         <button className="btn-signout" onClick={onSignOut}>
           <LogOut size={16} />

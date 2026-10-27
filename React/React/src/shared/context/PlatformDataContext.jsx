@@ -11,6 +11,10 @@ const EMPTY = {
   alumniByCollege: {},
   recruitersByCollege: {},
   applicationsByCollege: {},
+  supportTickets: [],
+  websiteContent: { features: [], testimonials: [], faqs: [], contacts: [] },
+  platformAnnouncements: [],
+  adminList: [],
 };
 
 export function PlatformDataProvider({ children }) {
@@ -24,10 +28,19 @@ export function PlatformDataProvider({ children }) {
   const collegeId = user?.collegeId;
 
   const refresh = useCallback(async () => {
-    if (role === 'super_admin') {
-      const [colleges, platformStats] = await Promise.all([
+    if (role === 'super_admin' || role === 'admin') {
+      const [colleges, platformStats, supportTickets, websiteContent, platformAnnouncements, adminList] = await Promise.all([
         api.get('/super-admin/colleges'),
         api.get('/super-admin/stats'),
+        api.get('/support-tickets').catch(() => ({ data: [] })),
+        Promise.all([
+          api.get('/website-content/features').catch(() => ({ data: [] })),
+          api.get('/website-content/testimonials').catch(() => ({ data: [] })),
+          api.get('/website-content/faqs').catch(() => ({ data: [] })),
+          api.get('/website-content/contacts').catch(() => ({ data: [] })),
+        ]),
+        api.get('/platform-announcements/all').catch(() => ({ data: [] })),
+        role === 'super_admin' ? api.get('/super-admin/admins').catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
       ]);
 
       const collegeList = colleges.data || [];
@@ -49,7 +62,21 @@ export function PlatformDataProvider({ children }) {
         // Backend scopes this endpoint — officer counts fall back to college.stats
       }
 
-      setData({ ...EMPTY, colleges: collegeList, officersByCollege });
+      const [features, testimonials, faqs, contacts] = websiteContent;
+      setData({
+        ...EMPTY,
+        colleges: collegeList,
+        officersByCollege,
+        supportTickets: supportTickets.data || [],
+        websiteContent: {
+          features: features.data || [],
+          testimonials: testimonials.data || [],
+          faqs: faqs.data || [],
+          contacts: contacts.data || [],
+        },
+        platformAnnouncements: platformAnnouncements.data || [],
+        adminList: adminList.data || [],
+      });
       setStats(platformStats.data);
 
     } else if (role === 'college_admin' && collegeId != null) {
@@ -74,7 +101,7 @@ export function PlatformDataProvider({ children }) {
   }, [role, collegeId]);
 
   useEffect(() => {
-    if (role !== 'super_admin' && role !== 'college_admin') {
+    if (role !== 'super_admin' && role !== 'admin' && role !== 'college_admin') {
       setData(EMPTY);
       setStats(null);
       return undefined;
@@ -98,6 +125,8 @@ export function PlatformDataProvider({ children }) {
   const actions = useMemo(() => ({
     // Super admin
     addCollege:       (payload)         => mutate(() => api.post('/super-admin/colleges', payload)),
+    updateCollege:    (id, payload)     => mutate(() => api.put(`/super-admin/colleges/${id}`, payload)),
+    removeCollege:    (id)              => mutate(() => api.delete(`/super-admin/colleges/${id}`)),
     setCollegeStatus: (id, status)      => mutate(() => api.patch(`/super-admin/colleges/${id}/status`, { status })),
     assignAdmin:      (id, payload)     => mutate(() => api.post(`/super-admin/colleges/${id}/admin`, payload)),
     setAdminStatus:   (id, status)      => mutate(() => api.patch(`/super-admin/colleges/${id}/admin/status`, { status })),
@@ -111,6 +140,21 @@ export function PlatformDataProvider({ children }) {
 
     // Activity log
     getActivityLog:   ()                => api.get('/super-admin/activity'),
+
+    // Platform operations
+    getSupportTickets: ()               => api.get('/support-tickets'),
+    getSupportTicketStats: ()           => api.get('/support-tickets/stats'),
+    getWebsiteContent: ()               => Promise.all([
+      api.get('/website-content/features'),
+      api.get('/website-content/testimonials'),
+      api.get('/website-content/faqs'),
+      api.get('/website-content/contacts').catch(() => ({ data: [] })),
+    ]),
+    getPlatformAnnouncements: ()        => api.get('/platform-announcements/all'),
+    getAdmins: ()                       => api.get('/super-admin/admins'),
+    addPlatformAdmin: (payload)         => mutate(() => api.post('/super-admin/admins', payload)),
+    updatePlatformAdmin: (id, payload) => mutate(() => api.put(`/super-admin/admins/${id}`, payload)),
+    removePlatformAdmin: (id)          => mutate(() => api.delete(`/super-admin/admins/${id}`)),
 
     // College admin
     addOfficer:       (payload)         => mutate(() => api.post('/users', { ...payload, role: 'placement_officer', collegeId: Number(collegeId) })),

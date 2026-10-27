@@ -1,4 +1,7 @@
-const features = [
+import { useEffect, useState } from 'react';
+import api from '../../../services/api.js';
+
+const FALLBACK_FEATURES = [
   {
     icon: "🔍",
     title: "Opportunity Discovery",
@@ -49,7 +52,52 @@ const features = [
   },
 ];
 
+const FEATURE_GRADIENTS = [
+  'linear-gradient(135deg, #4f6ef7, #38bdf8)',
+  'linear-gradient(135deg, #8b5cf6, #a855f7)',
+  'linear-gradient(135deg, #10b981, #34d399)',
+  'linear-gradient(135deg, #2563eb, #38bdf8)',
+  'linear-gradient(135deg, #f97316, #fb7185)',
+  'linear-gradient(135deg, #06b6d4, #22d3ee)',
+];
+
+const ICON_ALIASES = {
+  LayoutDashboard: '▦',
+  BarChart3: '📊',
+  ShieldCheck: '🛡️',
+  Users: '👥',
+  Calendar: '🗓️',
+};
+
+function displayIcon(icon) {
+  if (!icon) return '✦';
+  return ICON_ALIASES[icon] || icon;
+}
+
 function CoreFeatures() {
+  const [features, setFeatures] = useState(FALLBACK_FEATURES);
+
+  useEffect(() => {
+    let mounted = true;
+    api.get('/website-content/features')
+      .then(({ data }) => {
+        if (!mounted || !Array.isArray(data)) return;
+        setFeatures(
+          data
+            .filter((feature) => feature.isActive !== false)
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((feature, index) => ({
+              ...feature,
+              icon: displayIcon(feature.icon),
+              gradient: FEATURE_GRADIENTS[index % FEATURE_GRADIENTS.length],
+            })),
+        );
+      })
+      // The landing page stays useful when the API is temporarily offline.
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <section
       className="core-features"

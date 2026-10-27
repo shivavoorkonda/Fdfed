@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from '../../../services/api.js';
 
-const faqs = [
+const FALLBACK_FAQS = [
   {
     question: "Who can use CareerNest?",
     answer: (
@@ -53,6 +54,22 @@ const faqs = [
 function FAQ() {
   const [activeIndex, setActiveIndex] =
     useState(null);
+  const [faqs, setFaqs] = useState(FALLBACK_FAQS);
+
+  useEffect(() => {
+    let mounted = true;
+    api.get('/website-content/faqs')
+      .then(({ data }) => {
+        if (!mounted || !Array.isArray(data)) return;
+        setFaqs(
+          data
+            .filter((faq) => faq.isActive !== false)
+            .sort((a, b) => (a.order || 0) - (b.order || 0)),
+        );
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
 
   const toggleFAQ = (index) => {
     setActiveIndex(

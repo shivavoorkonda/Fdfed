@@ -503,21 +503,6 @@
   margin-top: 4px;
 }
 
-/* ================= TIER PILLS ================= */
-.cn-super-admin .tier-pill {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-.cn-super-admin .tier-pill.premium  { background: #7c3aed; }
-.cn-super-admin .tier-pill.standard { background: #0ea5e9; }
-.cn-super-admin .tier-pill.basic    { background: #10b981; }
-
 /* ================= EMPTY STATE ================= */
 .cn-super-admin .empty-state {
   text-align: center;
@@ -639,15 +624,6 @@
   color: #b45309;
   margin-top: 2px;
 }
-
-/* ================= REVENUE ACCENT ================= */
-.cn-super-admin .stat-card.revenue-accent {
-  border-left: 4px solid var(--sa-primary);
-}
-
-.cn-super-admin .stat-card.tier-premium { border-left: 4px solid #7c3aed; }
-.cn-super-admin .stat-card.tier-standard { border-left: 4px solid #0ea5e9; }
-.cn-super-admin .stat-card.tier-basic { border-left: 4px solid #10b981; }
 
 /* ================= TOAST ================= */
 .cn-super-admin .toast {
@@ -1344,6 +1320,147 @@
 .cn-super-admin .sa-profile-field textarea:focus { outline: 0; border-color: var(--sa-primary); box-shadow: 0 0 0 3px rgba(124, 58, 237, .1); }
 
 @media (max-width: 800px) { .cn-super-admin .sa-profile-grid { grid-template-columns: 1fr; } }
+
+/* ================= OBSERVER WORKSPACE ================= */
+.cn-super-admin .sidebar-role-badge span,
+.cn-super-admin .sa-observer-pill,
+.cn-super-admin .sa-observer-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cn-super-admin .sa-observer-pill {
+  padding: 5px 9px;
+  border: 1px solid #ddd6fe;
+  border-radius: 999px;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cn-super-admin .sa-observer-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 26px 28px;
+  border: 1px solid #ddd6fe;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #312e81, #6d28d9);
+  color: #fff;
+}
+
+.cn-super-admin .sa-observer-kicker {
+  margin-bottom: 9px;
+  color: #ddd6fe;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.cn-super-admin .sa-observer-banner h2 { margin: 0 0 6px; font-size: 23px; }
+.cn-super-admin .sa-observer-banner p { max-width: 620px; margin: 0; color: #e9d5ff; font-size: 13px; line-height: 1.55; }
+
+.cn-super-admin .sa-health {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px 7px;
+  min-width: 130px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 12px;
+  background: rgba(255,255,255,.12);
+  color: #ede9fe;
+  font-size: 12px;
+}
+.cn-super-admin .sa-health svg { grid-row: span 2; align-self: center; }
+.cn-super-admin .sa-health strong { color: #fff; font-size: 21px; line-height: 1; }
+
+.cn-super-admin .sa-observer-metric { min-height: 112px; }
+.cn-super-admin .sa-observer-metric-head { display: flex; justify-content: space-between; align-items: center; }
+.cn-super-admin .sa-observer-metric .stat-value { margin-top: 7px; }
+
+.cn-super-admin .sa-observer-intro {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 19px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--border-color);
+}
+.cn-super-admin .sa-observer-intro > svg { color: var(--sa-primary); flex: none; }
+.cn-super-admin .sa-observer-intro > div { flex: 1; }
+.cn-super-admin .sa-observer-intro h2 { margin: 0 0 3px; color: var(--text-dark); font-size: 18px; }
+.cn-super-admin .sa-observer-intro p { margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.45; }
+
+.cn-super-admin .sa-observer-summary { display: flex; flex-direction: column; gap: 1px; }
+.cn-super-admin .sa-observer-summary > div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.cn-super-admin .sa-observer-summary > div:last-child { border-bottom: 0; }
+.cn-super-admin .sa-observer-summary span { color: var(--text-muted); font-size: 12px; }
+.cn-super-admin .sa-observer-summary strong { color: var(--text-dark); font-size: 13px; text-align: right; }
+.cn-super-admin .sa-muted { color: var(--text-light); font-size: 12px; }
+
+.cn-super-admin .sa-observer-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.cn-super-admin .sa-observer-filters input,
+.cn-super-admin .sa-observer-filters select {
+  min-height: 39px;
+  padding: 8px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--text-dark);
+  font: inherit;
+  font-size: 13px;
+}
+.cn-super-admin .sa-observer-filters input { flex: 1; }
+.cn-super-admin .sa-observer-filters select { min-width: 150px; }
+.cn-super-admin .sa-observer-filters input:focus,
+.cn-super-admin .sa-observer-filters select:focus { outline: 0; border-color: var(--sa-primary); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+
+.cn-super-admin .sa-observer-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+.cn-super-admin .sa-observer-compact-grid { grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); }
+
+.cn-super-admin .sa-profile-observer-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+  border: 1px solid #ddd6fe;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+}
+.cn-super-admin .sa-profile-observer-avatar { display: grid; width: 62px; height: 62px; flex: none; place-items: center; border-radius: 50%; background: var(--sa-primary); color: #fff; font-size: 19px; font-weight: 800; }
+.cn-super-admin .sa-profile-observer-card h3 { margin: 0 0 4px; color: var(--text-dark); font-size: 18px; }
+.cn-super-admin .sa-profile-observer-card p { margin: 0 0 8px; color: var(--text-muted); font-size: 13px; }
+
+@media (max-width: 760px) {
+  .cn-super-admin .sa-observer-banner { align-items: flex-start; flex-direction: column; }
+  .cn-super-admin .sa-observer-intro { align-items: flex-start; flex-wrap: wrap; }
+  .cn-super-admin .sa-observer-intro .badge { margin-left: 31px; }
+  .cn-super-admin .sa-observer-filters { flex-direction: column; }
+  .cn-super-admin .sa-observer-filters select { width: 100%; }
+  .cn-super-admin .sa-observer-pill { display: none; }
+}
 
 
 

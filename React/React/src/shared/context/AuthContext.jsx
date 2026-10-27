@@ -9,10 +9,11 @@ const ROLE_HOME = {
   recruiter: '/recruiter',
   placement_officer: '/placement',
   college_admin: '/college-admin',
+  admin: '/admin',
   super_admin: '/super-admin',
 };
 
-const PROTECTED_PATH_PREFIXES = ['/candidate', '/alumni', '/recruiter', '/placement', '/college-admin', '/super-admin'];
+const PROTECTED_PATH_PREFIXES = ['/candidate', '/alumni', '/recruiter', '/placement', '/college-admin', '/admin', '/super-admin'];
 
 function isProtectedPath(pathname) {
   return PROTECTED_PATH_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));

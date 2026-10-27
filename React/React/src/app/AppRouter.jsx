@@ -10,6 +10,7 @@ const AlumniApp = lazy(() => import('../roles/alumni/AlumniApp.jsx'));
 const RecruiterApp = lazy(() => import('../roles/recruiter/RecruiterApp.jsx'));
 const PlacementApp = lazy(() => import('../roles/placement-officer/PlacementApp.jsx'));
 const CollegeAdminApp = lazy(() => import('../roles/college-admin/CollegeAdminApp.jsx'));
+const AdminApp = lazy(() => import('../roles/admin/AdminApp.jsx'));
 const SuperAdminApp = lazy(() => import('../roles/super-admin/SuperAdminApp.jsx'));
 const RecruiterContactPage = lazy(() => import('../public-pages/recruiter-contact/RecruiterContactPage.jsx'));
 const ContactPage = lazy(() => import('../public-pages/contact/ContactPage.jsx'));
@@ -34,6 +35,7 @@ export default function AppRouter() {
           <Route path="/recruiter/*" element={secured('recruiter', RecruiterApp)} />
           <Route path="/placement/*" element={secured('placement_officer', PlacementApp)} />
           <Route path="/college-admin/*" element={secured('college_admin', CollegeAdminApp)} />
+          <Route path="/admin/*" element={secured('admin', AdminApp)} />
           <Route path="/super-admin/*" element={secured('super_admin', SuperAdminApp)} />
           <Route path="*" element={<LandingPage />} />
         </Routes>

@@ -1032,3 +1032,224 @@
 @media (max-width: 800px) {
   .cn-college-admin .ca-profile-grid { grid-template-columns: 1fr; }
 }
+
+/* ================= COLLEGE ADMIN WORKFLOW PAGES ================= */
+.cn-college-admin .ca-feature-hero {
+  min-height: 130px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  color: #fff;
+  border-radius: 16px;
+  background: linear-gradient(125deg, #075985, #0ea5e9);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, .18);
+}
+.cn-college-admin .ca-feature-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  color: #dff5ff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.cn-college-admin .ca-feature-hero h2 { margin: 0; font-size: 22px; }
+.cn-college-admin .ca-feature-hero p { max-width: 620px; margin: 6px 0 0; color: #e0f2fe; font-size: 13px; line-height: 1.55; }
+.cn-college-admin .ca-feature-hero .btn-primary { background: #fff; color: #0369a1; white-space: nowrap; }
+.cn-college-admin .ca-feature-hero .btn-primary:hover { background: #e0f2fe; }
+.cn-college-admin .ca-feature-hero__icon {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 16px;
+  background: rgba(255,255,255,.14);
+}
+.cn-college-admin .ca-feature-card {
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+.cn-college-admin .ca-feature-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.cn-college-admin .ca-feature-stats article {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #fff;
+}
+.cn-college-admin .ca-feature-stats article > svg { color: var(--ca-primary); }
+.cn-college-admin .ca-feature-stats span { display: block; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.cn-college-admin .ca-feature-stats strong { display: block; margin-top: 2px; color: var(--text-dark); font-size: 22px; line-height: 1; }
+.cn-college-admin .ca-feature-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.cn-college-admin .ca-search-field {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  min-width: 180px;
+  padding: 0 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  color: var(--text-light);
+  background: #fff;
+}
+.cn-college-admin .ca-search-field input { width: 100%; padding: 10px 0; border: 0; outline: 0; color: var(--text-dark); font: inherit; font-size: 13px; }
+.cn-college-admin .ca-select-field { display: grid; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.cn-college-admin .ca-select-field select {
+  min-width: 130px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  color: var(--text-dark);
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+.cn-college-admin .ca-alumni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.cn-college-admin .ca-alumni-card { overflow: hidden; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+.cn-college-admin .ca-alumni-card__top { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+.cn-college-admin .ca-alumni-avatar {
+  display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%;
+  color: #fff; background: linear-gradient(135deg, #0284c7, #38bdf8); font-size: 12px; font-weight: 800;
+}
+.cn-college-admin .ca-alumni-card h3 { margin: 0; overflow: hidden; color: var(--text-dark); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.cn-college-admin .ca-alumni-card__top p { margin: 3px 0 0; overflow: hidden; color: var(--text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.cn-college-admin .ca-alumni-card dl { display: grid; gap: 8px; margin: 0; padding: 14px 15px; }
+.cn-college-admin .ca-alumni-card dl div { display: grid; grid-template-columns: 102px minmax(0, 1fr); gap: 8px; }
+.cn-college-admin .ca-alumni-card dt { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; }
+.cn-college-admin .ca-alumni-card dd { margin: 0; overflow: hidden; color: var(--text-dark); font-size: 12px; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.cn-college-admin .ca-alumni-card footer { display: flex; align-items: center; gap: 6px; padding: 11px 15px; color: #047857; border-top: 1px solid #d1fae5; background: #ecfdf5; font-size: 11px; font-weight: 700; }
+
+/* Drive calendar */
+.cn-college-admin .ca-drive-summary { display: flex; align-items: center; gap: 18px; padding: 0 2px 16px; color: var(--text-muted); font-size: 13px; }
+.cn-college-admin .ca-drive-summary strong { color: var(--text-dark); }
+.cn-college-admin .ca-drive-summary .btn { margin-left: auto; }
+.cn-college-admin .ca-calendar-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(270px, .8fr); gap: 18px; }
+.cn-college-admin .ca-calendar-card { padding: 16px; overflow: hidden; }
+.cn-college-admin .ca-calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cn-college-admin .ca-calendar-head h3 { margin: 0; color: var(--text-dark); font-size: 16px; }
+.cn-college-admin .ca-calendar-head button { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-muted); background: #fff; cursor: pointer; }
+.cn-college-admin .ca-calendar-head button:hover { color: var(--ca-primary); border-color: var(--ca-primary); }
+.cn-college-admin .ca-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid #e2e8f0; border-left: 1px solid #e2e8f0; }
+.cn-college-admin .ca-calendar-grid--weekdays { border: 0; margin-bottom: 5px; }
+.cn-college-admin .ca-calendar-grid--weekdays span { padding: 6px 0; color: var(--text-muted); font-size: 10px; font-weight: 800; text-align: center; text-transform: uppercase; }
+.cn-college-admin .ca-calendar-day { min-height: 88px; box-sizing: border-box; padding: 6px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #fff; }
+.cn-college-admin .ca-calendar-day > span { display: inline-grid; width: 21px; height: 21px; place-items: center; margin-bottom: 3px; color: var(--text-dark); border-radius: 50%; font-size: 11px; font-weight: 700; }
+.cn-college-admin .ca-calendar-day.muted { background: #f8fafc; }
+.cn-college-admin .ca-calendar-day.muted > span { color: #94a3b8; }
+.cn-college-admin .ca-calendar-day.today > span { color: #fff; background: var(--ca-primary); }
+.cn-college-admin .ca-calendar-event { display: block; width: 100%; overflow: hidden; margin: 2px 0; padding: 3px 5px; border: 0; border-radius: 4px; color: #075985; background: #e0f2fe; cursor: pointer; font: inherit; font-size: 10px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.cn-college-admin .ca-calendar-event.pending { color: #92400e; background: #fef3c7; }
+.cn-college-admin .ca-calendar-event.closed { color: #64748b; background: #f1f5f9; }
+.cn-college-admin .ca-calendar-day small { color: var(--text-muted); font-size: 9px; }
+.cn-college-admin .ca-drive-detail h3 { margin: 11px 0 2px; color: var(--text-dark); font-size: 18px; }
+.cn-college-admin .ca-drive-company { margin: 0 0 17px; color: var(--text-muted); font-size: 13px; }
+.cn-college-admin .ca-status-dot { display: inline-flex; padding: 4px 8px; border-radius: 999px; color: #0369a1; background: #e0f2fe; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.cn-college-admin .ca-status-dot.pending { color: #92400e; background: #fef3c7; }
+.cn-college-admin .ca-status-dot.closed { color: #475569; background: #f1f5f9; }
+.cn-college-admin .ca-drive-detail dl { display: grid; gap: 13px; margin: 0; }
+.cn-college-admin .ca-drive-detail dl div { display: grid; gap: 3px; }
+.cn-college-admin .ca-drive-detail dt { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.cn-college-admin .ca-drive-detail dd { margin: 0; color: var(--text-dark); font-size: 13px; line-height: 1.45; }
+.cn-college-admin .ca-drive-detail__meta { margin: 20px 0 0; padding-top: 13px; color: #0369a1; border-top: 1px solid #e0f2fe; font-size: 12px; font-weight: 700; }
+
+/* Support tickets */
+.cn-college-admin .ca-feature-stats--tickets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cn-college-admin .ca-support-layout { display: grid; grid-template-columns: minmax(260px, .85fr) minmax(0, 1.35fr); gap: 18px; }
+.cn-college-admin .ca-ticket-list { padding: 10px; }
+.cn-college-admin .ca-ticket-filters { display: flex; flex-wrap: wrap; gap: 5px; padding: 4px 4px 10px; }
+.cn-college-admin .ca-ticket-filters button { padding: 6px 8px; border: 0; border-radius: 7px; color: var(--text-muted); background: transparent; cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; text-transform: capitalize; }
+.cn-college-admin .ca-ticket-filters button.active { color: #0369a1; background: #e0f2fe; }
+.cn-college-admin .ca-ticket-row { display: grid; grid-template-columns: 7px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; padding: 12px 8px; border: 0; border-top: 1px solid #f1f5f9; background: transparent; cursor: pointer; color: var(--text-dark); text-align: left; }
+.cn-college-admin .ca-ticket-row:hover, .cn-college-admin .ca-ticket-row.selected { background: #f0f9ff; }
+.cn-college-admin .ca-ticket-row strong, .cn-college-admin .ca-ticket-row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cn-college-admin .ca-ticket-row strong { font-size: 13px; }
+.cn-college-admin .ca-ticket-row small { margin-top: 4px; color: var(--text-muted); font-size: 10px; }
+.cn-college-admin .ca-ticket-priority { width: 7px; height: 32px; border-radius: 99px; background: #38bdf8; }
+.cn-college-admin .ca-ticket-priority.medium { background: #f59e0b; }
+.cn-college-admin .ca-ticket-priority.high { background: #f97316; }
+.cn-college-admin .ca-ticket-priority.urgent { background: #ef4444; }
+.cn-college-admin .ca-ticket-status { display: inline-flex; width: fit-content; padding: 3px 7px; border-radius: 999px; color: #0369a1; background: #e0f2fe; font-size: 10px; font-style: normal; font-weight: 800; text-transform: capitalize; white-space: nowrap; }
+.cn-college-admin .ca-ticket-status.in_progress { color: #92400e; background: #fef3c7; }
+.cn-college-admin .ca-ticket-status.resolved { color: #047857; background: #d1fae5; }
+.cn-college-admin .ca-ticket-status.closed { color: #475569; background: #e2e8f0; }
+.cn-college-admin .ca-ticket-detail { min-height: 420px; }
+.cn-college-admin .ca-ticket-detail__head { display: flex; justify-content: space-between; gap: 14px; }
+.cn-college-admin .ca-ticket-detail__head h3 { margin: 10px 0 0; color: var(--text-dark); font-size: 18px; }
+.cn-college-admin .ca-ticket-priority-label { height: fit-content; padding: 4px 7px; border-radius: 6px; color: #0369a1; background: #e0f2fe; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.cn-college-admin .ca-ticket-priority-label.high { color: #c2410c; background: #ffedd5; }
+.cn-college-admin .ca-ticket-priority-label.urgent { color: #b91c1c; background: #fee2e2; }
+.cn-college-admin .ca-ticket-detail__meta { margin: 7px 0 16px; color: var(--text-muted); font-size: 11px; }
+.cn-college-admin .ca-ticket-description { margin: 0; color: #334155; font-size: 13px; line-height: 1.6; }
+.cn-college-admin .ca-ticket-assignee { margin: 14px 0; padding: 9px 11px; color: #0369a1; border-radius: 8px; background: #f0f9ff; font-size: 12px; }
+.cn-college-admin .ca-ticket-resolution { display: flex; gap: 8px; margin: 14px 0; padding: 11px; color: #166534; border-radius: 8px; background: #ecfdf5; font-size: 12px; line-height: 1.5; }
+.cn-college-admin .ca-ticket-resolution strong { display: block; margin-bottom: 2px; }
+.cn-college-admin .ca-ticket-thread { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
+.cn-college-admin .ca-ticket-thread h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; color: var(--text-dark); font-size: 13px; }
+.cn-college-admin .ca-ticket-message { padding: 10px; margin: 8px 0; border-radius: 9px; background: #f8fafc; }
+.cn-college-admin .ca-ticket-message.mine { background: #e0f2fe; }
+.cn-college-admin .ca-ticket-message header { display: flex; justify-content: space-between; gap: 10px; color: #334155; font-size: 11px; }
+.cn-college-admin .ca-ticket-message header small { color: var(--text-muted); font-size: 10px; }
+.cn-college-admin .ca-ticket-message p { margin: 5px 0 0; color: #334155; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+.cn-college-admin .ca-ticket-empty-thread { color: var(--text-muted); font-size: 12px; }
+.cn-college-admin .ca-ticket-reply { display: grid; gap: 8px; margin-top: 14px; }
+.cn-college-admin .ca-ticket-reply textarea, .cn-college-admin .ca-ticket-composer textarea { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid var(--border-color); border-radius: 8px; font: inherit; font-size: 12px; resize: vertical; }
+.cn-college-admin .ca-ticket-reply textarea:focus, .cn-college-admin .ca-ticket-composer textarea:focus { outline: 0; border-color: var(--ca-primary); box-shadow: 0 0 0 3px rgba(14,165,233,.1); }
+.cn-college-admin .ca-ticket-composer { width: min(580px, 94vw); }
+.cn-college-admin .ca-ticket-composer__intro { margin: -10px 0 18px; color: var(--text-muted); font-size: 13px; }
+.cn-college-admin .ca-form-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* College settings */
+.cn-college-admin .ca-settings-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(250px, .7fr); gap: 18px; }
+.cn-college-admin .ca-settings-title { display: flex; align-items: center; gap: 8px; padding-bottom: 13px; margin-bottom: 6px; color: var(--text-dark); border-bottom: 1px solid #e2e8f0; }
+.cn-college-admin .ca-settings-title svg { color: var(--ca-primary); }
+.cn-college-admin .ca-settings-title h3 { margin: 0; font-size: 15px; }
+.cn-college-admin .ca-settings-details { margin: 0; }
+.cn-college-admin .ca-settings-details div { display: grid; grid-template-columns: 145px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.cn-college-admin .ca-settings-details div:last-child { border-bottom: 0; }
+.cn-college-admin .ca-settings-details dt { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12px; font-weight: 700; }
+.cn-college-admin .ca-settings-details dd { margin: 0; overflow-wrap: anywhere; color: var(--text-dark); font-size: 13px; text-align: right; }
+.cn-college-admin .ca-settings-details a { color: var(--ca-primary); }
+.cn-college-admin .ca-settings-form { display: grid; gap: 13px; }
+.cn-college-admin .ca-settings-form label { display: grid; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+.cn-college-admin .ca-settings-form input, .cn-college-admin .ca-settings-form textarea { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-dark); background: #fff; font: inherit; font-size: 13px; text-transform: none; }
+.cn-college-admin .ca-settings-form input:focus, .cn-college-admin .ca-settings-form textarea:focus { outline: 0; border-color: var(--ca-primary); box-shadow: 0 0 0 3px rgba(14,165,233,.1); }
+.cn-college-admin .ca-settings-form__actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 4px; }
+.cn-college-admin .ca-feature-error { margin: 0 0 16px; padding: 10px 12px; color: #b91c1c; border: 1px solid #fecaca; border-radius: 9px; background: #fef2f2; font-size: 12px; }
+.cn-college-admin .ca-spin { animation: ca-spin 1s linear infinite; }
+@keyframes ca-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1050px) {
+  .cn-college-admin .ca-feature-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cn-college-admin .ca-calendar-layout, .cn-college-admin .ca-support-layout, .cn-college-admin .ca-settings-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .cn-college-admin .ca-feature-hero { align-items: flex-start; padding: 20px; }
+  .cn-college-admin .ca-feature-hero__icon { display: none; }
+  .cn-college-admin .ca-feature-toolbar, .cn-college-admin .ca-drive-summary { align-items: stretch; flex-direction: column; }
+  .cn-college-admin .ca-drive-summary .btn { margin-left: 0; width: fit-content; }
+  .cn-college-admin .ca-feature-stats, .cn-college-admin .ca-feature-stats--tickets, .cn-college-admin .ca-form-two-col { grid-template-columns: 1fr; }
+  .cn-college-admin .ca-calendar-card { overflow-x: auto; }
+  .cn-college-admin .ca-calendar-grid { min-width: 560px; }
+  .cn-college-admin .ca-settings-details div { grid-template-columns: 1fr; gap: 4px; }
+  .cn-college-admin .ca-settings-details dd { text-align: left; }
+}

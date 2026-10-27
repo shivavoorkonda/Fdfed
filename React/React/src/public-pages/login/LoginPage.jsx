@@ -13,6 +13,7 @@ const ROLE_REDIRECT = {
   recruiter: "/recruiter",
   placement_officer: "/placement",
   college_admin: "/college-admin",
+  admin: "/admin",
   super_admin: "/super-admin",
 };
 
@@ -26,6 +27,7 @@ const DEMO_ACCOUNTS = [
   { role: "Recruiter",         email: "r@gmail.com",              password: "123" },
   { role: "Placement Officer", email: "p@gmail.com",              password: "123" },
   { role: "College Admin",     email: "ca@iiit.in",               password: "123" },
+  { role: "Admin",             email: "admin1@careernest.com",    password: "123" },
   { role: "Super Admin",       email: "superadmin@platform.com",  password: "123" },
 ];
 

@@ -19,8 +19,9 @@ import { ActivityService } from '../activity/activity.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { RequestUser } from '../common/guards/roles.guard';
 import { UsersRepository } from '../users/users.repository';
-import { IsString, IsOptional, IsNumber, Length } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEmail, Length } from 'class-validator';
 import { OnboardingRequestsRepository } from '../contact/onboarding-requests.repository';
+import { SupportTicketsService } from '../support-tickets/support-tickets.service';
 
 class SendMessageDto {
   @IsIn(['one', 'all']) toType: 'one' | 'all';
@@ -37,14 +38,22 @@ class AdminStatusDto {
 }
 
 class ReviewOnboardingDto {
-  @IsOptional() @IsIn(['basic', 'standard', 'premium']) tier?: 'basic' | 'standard' | 'premium';
   @IsOptional() @IsString() @Length(0, 1000) note?: string;
+}
+
+class PlatformAdminDto {
+  @IsOptional() @IsString() @Length(2, 100) name?: string;
+  @IsOptional() @IsEmail() email?: string;
+  @IsOptional() @IsString() @Length(2, 100) department?: string;
+  @IsOptional() @IsString() @Length(3, 30) phone?: string;
+  @IsOptional() @IsString() @Length(3, 100) password?: string;
+  @IsOptional() @IsIn(['active', 'inactive']) status?: 'active' | 'inactive';
 }
 
 @ApiTags('Super Admin')
 @ApiSecurity('x-role')
 @UseGuards(RolesGuard)
-@Roles('super_admin')
+@Roles('super_admin', 'admin')
 @Controller('super-admin')
 export class SuperAdminController {
   constructor(
@@ -54,11 +63,12 @@ export class SuperAdminController {
     private readonly activityRepo: ActivityService,
     private readonly usersRepo: UsersRepository,
     private readonly onboardingRequests: OnboardingRequestsRepository,
+    private readonly tickets: SupportTicketsService,
   ) {}
 
   private who(u: RequestUser) { return this.usersRepo.findById(u.userId ?? 0)?.name ?? 'Super admin'; }
   private log(u: RequestUser, action: string, detail: string, type: 'college' | 'admin' | 'message', collegeId?: number) {
-    this.activityRepo.log({ action, detail, actor: this.who(u), actorRole: 'super_admin', collegeId: collegeId ?? null, type });
+    this.activityRepo.log({ action, detail, actor: this.who(u), actorRole: u.role, collegeId: collegeId ?? null, type });
   }
 
   // ── Platform Stats ─────────────────────────────────────────────────────────
@@ -68,11 +78,68 @@ export class SuperAdminController {
     return this.superAdminService.getPlatformStats();
   }
 
-  // ── Revenue Model ──────────────────────────────────────────────────────────
-  @Get('revenue')
-  @ApiOperation({ summary: 'Revenue model — MRR, ARR, tier breakdown, drive fees (super_admin only)' })
-  getRevenue() {
-    return this.superAdminService.getRevenueStats();
+  // â”€â”€ Observer-only admin workload endpoints â”€â”€
+  @Get('admins')
+  @Roles('super_admin')
+  @ApiOperation({ summary: 'List platform administrators for observer oversight' })
+  getAdmins() {
+    return this.superAdminService.getPlatformAdmins();
+  }
+
+  @Post('admins')
+  @Roles('super_admin')
+  @ApiOperation({ summary: 'Create a platform admin' })
+  createPlatformAdmin(@Body() dto: PlatformAdminDto, @CurrentUser() user: RequestUser) {
+    if (!dto.name || !dto.email) throw new BadRequestException('Name and email are required');
+    const created = this.superAdminService.createPlatformAdmin(dto as Required<Pick<PlatformAdminDto, 'name' | 'email'>> & PlatformAdminDto);
+    this.log(user, 'Platform Admin Created', `${created.name} was added to the Admin team`, 'admin');
+    return created;
+  }
+
+  @Put('admins/:id')
+  @Roles('super_admin')
+  @ApiOperation({ summary: 'Update a platform admin' })
+  updatePlatformAdmin(@Param('id', ParseIntPipe) id: number, @Body() dto: PlatformAdminDto, @CurrentUser() user: RequestUser) {
+    const updated = this.superAdminService.updatePlatformAdmin(id, dto);
+    this.log(user, 'Platform Admin Updated', `${updated.name} was updated`, 'admin');
+    return updated;
+  }
+
+  @Delete('admins/:id')
+  @Roles('super_admin')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete a platform admin' })
+  removePlatformAdmin(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: RequestUser) {
+    const admin = this.superAdminService.updatePlatformAdmin(id, {});
+    const removed = this.superAdminService.removePlatformAdmin(id);
+    this.log(user, 'Platform Admin Deleted', `${admin.name} was removed from the Admin team`, 'admin');
+    return { removed };
+  }
+
+  @Get('admin-stats')
+  @Roles('super_admin')
+  @ApiOperation({ summary: 'Administrator workload and support ownership for observer oversight' })
+  getAdminStats() {
+    const tickets = this.tickets.findAll();
+    const activity = this.activityRepo.findAll();
+    const today = new Date().toISOString().slice(0, 10);
+    const admins = this.usersRepo.findAll().filter((user) => user.role === 'admin').map(({ password: _password, ...user }) => {
+      const recentActions = activity.filter((entry) => entry.actorRole === 'admin' && entry.actor === user.name);
+      const ownedTickets = tickets.filter((ticket) => ticket.assignedTo === user.id);
+      return {
+        ...user,
+        openTickets: ownedTickets.filter((ticket) => !['resolved', 'closed'].includes(ticket.status)).length,
+        resolvedTickets: ownedTickets.filter((ticket) => ['resolved', 'closed'].includes(ticket.status)).length,
+        actionsToday: recentActions.filter((entry) => entry.timestamp.slice(0, 10) === today).length,
+        recentActions: recentActions.slice(0, 5),
+      };
+    });
+    return {
+      totalAdmins: admins.length,
+      activeAdmins: admins.filter((admin) => admin.status !== 'inactive').length,
+      unassignedOpenTickets: tickets.filter((ticket) => !ticket.assignedTo && !['resolved', 'closed'].includes(ticket.status)).length,
+      admins,
+    };
   }
 
   // ── Colleges ───────────────────────────────────────────────────────────────
@@ -119,18 +186,8 @@ export class SuperAdminController {
     return updated;
   }
 
-  @Patch('colleges/:id/subscription')
-  @ApiOperation({ summary: 'Change college subscription tier — basic | standard | premium (super_admin only)' })
-  @ApiParam({ name: 'id', type: Number })
-  updateCollegeSubscription(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: { tier: 'basic' | 'standard' | 'premium' },
-  ) {
-    return this.superAdminService.changeSubscriptionTier(id, dto.tier);
-  }
-
   @Delete('colleges/:id')
-  @Roles('super_admin')
+  @Roles('super_admin', 'admin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a college (super_admin only)' })
   @ApiParam({ name: 'id', type: Number })
@@ -259,8 +316,6 @@ export class SuperAdminController {
       address: request.collegeAddress,
       website: request.collegeWebsite,
     });
-    const tier = body.tier ?? 'basic';
-    if (tier !== 'basic') this.superAdminService.changeSubscriptionTier(college.id, tier);
     const admin = this.superAdminService.createCollegeAdmin(college.id, {
       name: request.contactName,
       email: request.contactEmail,
