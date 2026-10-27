@@ -67,6 +67,14 @@ export class UsersService {
     return { message: 'Password updated successfully' };
   }
 
+  /** Demo password recovery. Production uses an emailed, expiring reset token. */
+  resetPasswordByEmail(email: string, newPassword: string): { message: string } {
+    const user = this.repo.findByEmail(email);
+    // Keep the response generic so the public endpoint does not disclose whether an email exists.
+    if (user) this.repo.update(user.id, { password: newPassword });
+    return { message: 'If an account exists for this email, its password has been reset. You can now sign in.' };
+  }
+
   login(email: string, password: string): SafeUser {
     const user = this.repo.findByEmail(email);
     if (!user) throw new UnauthorizedException('Invalid email or password');

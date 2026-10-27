@@ -8,7 +8,6 @@ import Features from "./components/Features";
 import Process from "./components/Process";
 import Testimonials from "./components/Testimonals";
 import FAQ from "./components/FAQ";
-import ContactSection from "./components/ContactSection";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
 
@@ -32,7 +31,6 @@ function LandingContent() {
         <Process />
         <Testimonials />
         <FAQ />
-        <ContactSection />
         <CTA />
       </main>
       <Footer />

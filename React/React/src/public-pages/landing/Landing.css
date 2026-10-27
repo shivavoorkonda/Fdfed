@@ -1995,7 +1995,12 @@
   background: var(--card-bg); border: 1px solid var(--card-border);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
 }
+.cn-landing .contact-tabs { display: flex; gap: 8px; margin-bottom: 28px; padding: 5px; border: 1px solid var(--card-border); border-radius: 12px; background: rgba(99, 102, 241, .06); }
+.cn-landing .contact-tabs button { flex: 1; border: 0; border-radius: 8px; padding: 11px 14px; background: transparent; color: var(--text-secondary); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+.cn-landing .contact-tabs button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-glow); }
 .cn-landing .contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.cn-landing .contact-form-title { margin: 24px 0 14px; color: var(--text-primary); font-size: 16px; }
+.cn-landing form .contact-form-title:first-child { margin-top: 0; }
 .cn-landing .contact-field { display: flex; flex-direction: column; gap: 6px; }
 .cn-landing .contact-field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .cn-landing .contact-field input,
@@ -2018,4 +2023,4 @@
 .cn-landing .contact-success-icon { width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); color: #22c55e; font-size: 28px; display: flex; align-items: center; justify-content: center; }
 .cn-landing .contact-success h3 { color: var(--text-primary); margin-bottom: 8px; }
 .cn-landing .contact-success p { color: var(--text-secondary); margin-bottom: 20px; }
-@media (max-width: 640px) { .cn-landing .contact-grid { grid-template-columns: 1fr; } .cn-landing .contact-card { padding: 22px; } }
+@media (max-width: 640px) { .cn-landing .contact-grid { grid-template-columns: 1fr; } .cn-landing .contact-card { padding: 22px; } .cn-landing .contact-tabs { flex-direction: column; } }

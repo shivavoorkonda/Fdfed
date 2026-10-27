@@ -7,6 +7,7 @@ import CollegeAdmins from './pages/CollegeAdmins';
 import ActivityLog from './pages/ActivityLog';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
+import OnboardingRequests from './pages/OnboardingRequests';
 import SignOutModal from './components/SignOutModal';
 import { clearSession } from '../../services/api.js';
 import { usePlatformData } from '../../shared/context/PlatformDataContext.jsx';
@@ -23,6 +24,7 @@ function getTitle(tab) {
     case 'dashboard':      return 'Platform Dashboard';
     case 'colleges':       return 'Colleges';
     case 'college-admins': return 'College Admin Management';
+    case 'onboarding':     return 'College Onboarding Requests';
     case 'activity':       return 'Activity Log';
     case 'messages':       return 'Messages';
     case 'profile':        return 'My Profile';
@@ -30,7 +32,7 @@ function getTitle(tab) {
   }
 }
 
-const SUPER_ADMIN_TABS = ['dashboard', 'colleges', 'college-admins', 'activity', 'messages', 'profile'];
+const SUPER_ADMIN_TABS = ['dashboard', 'colleges', 'college-admins', 'onboarding', 'activity', 'messages', 'profile'];
 const SUPER_ADMIN_TAB_KEY = 'cn_active_super_admin_tab';
 
 export default function SuperAdminApp() {
@@ -97,6 +99,7 @@ export default function SuperAdminApp() {
             {activeTab === 'dashboard'      && <SADashboard {...pageProps} data={data} userName={userName} avatarInitials={getInitials(userName)} />}
             {activeTab === 'colleges'       && <Colleges     {...pageProps} />}
             {activeTab === 'college-admins' && <CollegeAdmins {...pageProps} />}
+            {activeTab === 'onboarding'     && <OnboardingRequests {...pageProps} />}
             {activeTab === 'activity'       && <ActivityLog />}
             {activeTab === 'messages'       && <Messages colleges={data.colleges} />}
             {activeTab === 'profile'        && <Profile showToast={showToast} onProfileUpdated={setUser} />}

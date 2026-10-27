@@ -11,6 +11,8 @@ const RecruiterApp = lazy(() => import('../roles/recruiter/RecruiterApp.jsx'));
 const PlacementApp = lazy(() => import('../roles/placement-officer/PlacementApp.jsx'));
 const CollegeAdminApp = lazy(() => import('../roles/college-admin/CollegeAdminApp.jsx'));
 const SuperAdminApp = lazy(() => import('../roles/super-admin/SuperAdminApp.jsx'));
+const RecruiterContactPage = lazy(() => import('../public-pages/recruiter-contact/RecruiterContactPage.jsx'));
+const ContactPage = lazy(() => import('../public-pages/contact/ContactPage.jsx'));
 
 const secured = (role, App) => (
   <ProtectedRoute allowedRole={role}>
@@ -25,6 +27,8 @@ export default function AppRouter() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/recruiter-contact" element={<Suspense fallback={<main className="route-loading">Loading…</main>}><RecruiterContactPage /></Suspense>} />
+          <Route path="/contact" element={<Suspense fallback={<main className="route-loading">Loading…</main>}><ContactPage /></Suspense>} />
           <Route path="/candidate/*" element={secured('candidate', CandidateApp)} />
           <Route path="/alumni/*" element={secured('alumni', AlumniApp)} />
           <Route path="/recruiter/*" element={secured('recruiter', RecruiterApp)} />

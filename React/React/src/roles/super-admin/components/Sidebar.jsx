@@ -1,12 +1,13 @@
 import React from 'react';
 import {
-  LayoutDashboard, Building2, UserCog, Activity, Crown, LogOut, MessageSquare
+  LayoutDashboard, Building2, UserCog, Activity, Crown, LogOut, MessageSquare, ClipboardList
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { id: 'dashboard',      label: 'Dashboard',        icon: LayoutDashboard },
   { id: 'colleges',       label: 'Colleges',          icon: Building2 },
   { id: 'college-admins', label: 'College Admins',    icon: UserCog },
+  { id: 'onboarding',     label: 'Onboarding',        icon: ClipboardList },
   { id: 'messages',       label: 'Messages',          icon: MessageSquare },
   { id: 'activity',       label: 'Activity Log',      icon: Activity },
 ];

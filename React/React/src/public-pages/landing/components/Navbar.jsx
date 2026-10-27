@@ -117,10 +117,11 @@ function Navbar() {
           </li>
           <li>
             <a
-              href="#contact"
+              href="/contact"
               onClick={(e) => {
                 e.preventDefault();
-                scrollToSection("contact");
+                navigate("/contact");
+                setMobileOpen(false);
               }}
             >
               Contact

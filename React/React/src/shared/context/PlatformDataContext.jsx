@@ -101,6 +101,9 @@ export function PlatformDataProvider({ children }) {
     setCollegeStatus: (id, status)      => mutate(() => api.patch(`/super-admin/colleges/${id}/status`, { status })),
     assignAdmin:      (id, payload)     => mutate(() => api.post(`/super-admin/colleges/${id}/admin`, payload)),
     setAdminStatus:   (id, status)      => mutate(() => api.patch(`/super-admin/colleges/${id}/admin/status`, { status })),
+    getOnboardingRequests: ()           => api.get('/super-admin/onboarding-requests'),
+    approveOnboarding: (id, payload)    => mutate(() => api.patch(`/super-admin/onboarding-requests/${id}/approve`, payload)),
+    rejectOnboarding: (id, payload)     => mutate(() => api.patch(`/super-admin/onboarding-requests/${id}/reject`, payload)),
 
     // Messaging — returns the API promise directly (no data refresh needed)
     sendMessage:      (payload)         => api.post('/super-admin/messages', payload),

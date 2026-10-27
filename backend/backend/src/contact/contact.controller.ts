@@ -4,12 +4,18 @@ import { RecruitersService } from '../recruiters/recruiters.service';
 import { CreateRecruiterDto } from '../recruiters/dto/create-recruiter.dto';
 import { CollegesRepository } from '../colleges/colleges.repository';
 import { Public } from '../common/decorators/public.decorator';
+import { OnboardingRequestsRepository } from './onboarding-requests.repository';
+import { CreateOnboardingRequestDto } from './dto/create-onboarding-request.dto';
 
 /** Public landing-page contact operations. */
 @ApiTags('Contact')
 @Controller('contact')
 export class ContactController {
-  constructor(private readonly recruiters: RecruitersService, private readonly colleges: CollegesRepository) {}
+  constructor(
+    private readonly recruiters: RecruitersService,
+    private readonly colleges: CollegesRepository,
+    private readonly onboardingRequests: OnboardingRequestsRepository,
+  ) {}
 
   @Get('colleges')
   @Public()
@@ -25,5 +31,20 @@ export class ContactController {
   submit(@Body() dto: CreateRecruiterDto) {
     const created = this.recruiters.create(dto, 'contact-form');
     return { id: created.id, message: 'Thanks! The placement cell will review your request and email your login once verified.' };
+  }
+
+  @Post('college-onboarding')
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Submit a college onboarding request for super-admin review' })
+  submitOnboarding(@Body() dto: CreateOnboardingRequestDto) {
+    const existing = this.onboardingRequests.findAll().find((request) =>
+      request.collegeEmail.toLowerCase() === dto.collegeEmail.toLowerCase() && request.status === 'pending',
+    );
+    if (existing) {
+      return { id: existing.id, message: 'An onboarding request for this college is already pending. We will get back to you soon.' };
+    }
+    const created = this.onboardingRequests.create(dto);
+    return { id: created.id, message: 'Your onboarding request has been submitted! The CareerNest team will review and reach out shortly.' };
   }
 }

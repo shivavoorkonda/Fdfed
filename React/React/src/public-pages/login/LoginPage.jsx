@@ -41,6 +41,13 @@ function LoginPage() {
   const [messageColor, setMessageColor] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDemoHints, setShowDemoHints] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetStep, setResetStep] = useState("email");
 
   useEffect(() => {
     document.title = "Login — CareerNest";
@@ -154,6 +161,59 @@ function LoginPage() {
     window.location.href = "/";
   };
 
+  const openForgotPassword = () => {
+    setResetEmail(email);
+    setResetPassword("");
+    setResetConfirmPassword("");
+    setResetMessage("");
+    setResetStep("email");
+    setShowForgotPassword(true);
+  };
+
+  const continuePasswordReset = (event) => {
+    event.preventDefault();
+    const cleanEmail = resetEmail.trim();
+    if (!/^\S+@\S+\.[A-Za-z]{2,}$/.test(cleanEmail)) {
+      setResetMessage("Enter the email address registered to your account.");
+      return;
+    }
+    setResetEmail(cleanEmail);
+    setResetMessage("");
+    setResetStep("password");
+  };
+
+  const resetAccountPassword = async (event) => {
+    event.preventDefault();
+    const cleanEmail = resetEmail.trim();
+    if (resetPassword.length < 3) {
+      setResetMessage("Your new password must contain at least 3 characters.");
+      return;
+    }
+    if (resetPassword !== resetConfirmPassword) {
+      setResetMessage("The new password and confirmation do not match.");
+      return;
+    }
+    setResetLoading(true);
+    setResetMessage("");
+    try {
+      const response = await fetch(`${BASE_URL}/users/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, newPassword: resetPassword }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(Array.isArray(data.message) ? data.message.join(", ") : data.message);
+      setEmail(cleanEmail);
+      setPassword("");
+      setResetMessage(data.message || "Password reset successfully. You can now sign in.");
+      setResetStep("complete");
+    } catch (error) {
+      setResetMessage(error.message || "Could not reset your password. Please try again.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   /* =========================================================
      PAGE
      ========================================================= */
@@ -220,6 +280,7 @@ function LoginPage() {
                   <i className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                 </span>
               </div>
+              <button type="button" className="forgot-password-btn" onClick={openForgotPassword}>Forgot password?</button>
             </div>
 
 
@@ -268,7 +329,46 @@ function LoginPage() {
               )}
             </div>
 
+            <div className="recruiter-contact-link">
+              <span>Recruiter looking to hire from campus?</span>
+              <a href="/recruiter-contact">Contact a college →</a>
+            </div>
+
           </div>
+
+          {showForgotPassword && (
+            <div className="forgot-password-backdrop" onClick={() => setShowForgotPassword(false)}>
+              <form className="forgot-password-modal" onSubmit={resetStep === "email" ? continuePasswordReset : resetAccountPassword} onClick={(event) => event.stopPropagation()}>
+                <button type="button" className="forgot-password-close" onClick={() => setShowForgotPassword(false)} aria-label="Close">×</button>
+                {resetStep === "email" && <>
+                  <span className="forgot-password-step">Step 1 of 2</span>
+                  <h2>Find your account</h2>
+                  <p>Enter the email address registered to your CareerNest account.</p>
+                  <label>Email address</label>
+                  <input type="email" value={resetEmail} onChange={(event) => setResetEmail(event.target.value)} autoComplete="email" required autoFocus />
+                  {resetMessage && <p className="forgot-password-message">{resetMessage}</p>}
+                  <button className="login-btn" type="submit">Continue</button>
+                </>}
+                {resetStep === "password" && <>
+                  <span className="forgot-password-step">Step 2 of 2</span>
+                  <h2>Choose a new password</h2>
+                  <p>Resetting the password for <strong>{resetEmail}</strong>.</p>
+                  <label>New password</label>
+                  <input type="password" value={resetPassword} onChange={(event) => setResetPassword(event.target.value)} autoComplete="new-password" required autoFocus />
+                  <label>Confirm new password</label>
+                  <input type="password" value={resetConfirmPassword} onChange={(event) => setResetConfirmPassword(event.target.value)} autoComplete="new-password" required />
+                  {resetMessage && <p className="forgot-password-message">{resetMessage}</p>}
+                  <div className="forgot-password-actions"><button type="button" className="forgot-password-back" onClick={() => { setResetMessage(""); setResetStep("email"); }}>Back</button><button className="login-btn" type="submit" disabled={resetLoading}>{resetLoading ? "Resetting…" : "Reset Password"}</button></div>
+                </>}
+                {resetStep === "complete" && <>
+                  <span className="forgot-password-step">Complete</span>
+                  <h2>Password changed</h2>
+                  <p className="forgot-password-success">{resetMessage}</p>
+                  <button className="login-btn" type="button" onClick={() => setShowForgotPassword(false)}>Back to sign in</button>
+                </>}
+              </form>
+            </div>
+          )}
 
 
           {/* =================================================

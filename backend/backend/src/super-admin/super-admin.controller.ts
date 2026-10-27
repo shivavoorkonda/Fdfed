@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Put, Patch, Delete,
-  Param, Body, ParseIntPipe, UseGuards, HttpCode, HttpStatus, BadRequestException,
+  Param, Body, ParseIntPipe, UseGuards, HttpCode, HttpStatus, BadRequestException, NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiSecurity, ApiResponse } from '@nestjs/swagger';
 import { SuperAdminService } from './super-admin.service';
@@ -20,6 +20,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { RequestUser } from '../common/guards/roles.guard';
 import { UsersRepository } from '../users/users.repository';
 import { IsString, IsOptional, IsNumber, Length } from 'class-validator';
+import { OnboardingRequestsRepository } from '../contact/onboarding-requests.repository';
 
 class SendMessageDto {
   @IsIn(['one', 'all']) toType: 'one' | 'all';
@@ -35,6 +36,11 @@ class AdminStatusDto {
   status: 'active' | 'inactive';
 }
 
+class ReviewOnboardingDto {
+  @IsOptional() @IsIn(['basic', 'standard', 'premium']) tier?: 'basic' | 'standard' | 'premium';
+  @IsOptional() @IsString() @Length(0, 1000) note?: string;
+}
+
 @ApiTags('Super Admin')
 @ApiSecurity('x-role')
 @UseGuards(RolesGuard)
@@ -47,6 +53,7 @@ export class SuperAdminController {
     private readonly messagesRepo: SAMessagesRepository,
     private readonly activityRepo: ActivityService,
     private readonly usersRepo: UsersRepository,
+    private readonly onboardingRequests: OnboardingRequestsRepository,
   ) {}
 
   private who(u: RequestUser) { return this.usersRepo.findById(u.userId ?? 0)?.name ?? 'Super admin'; }
@@ -215,5 +222,71 @@ export class SuperAdminController {
   @ApiOperation({ summary: 'Get platform activity log (super_admin only)' })
   getActivity() {
     return this.activityRepo.findAll();
+  }
+
+  // ── College onboarding requests ────────────────────────────────────────
+  @Get('onboarding-requests')
+  @ApiOperation({ summary: 'All college onboarding requests (super_admin only)' })
+  getOnboardingRequests() {
+    return this.onboardingRequests.findAll();
+  }
+
+  @Patch('onboarding-requests/:id/approve')
+  @ApiOperation({ summary: 'Approve onboarding and create the college plus its admin' })
+  approveOnboarding(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: ReviewOnboardingDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const request = this.onboardingRequests.findById(id);
+    if (!request) throw new NotFoundException(`Onboarding request ${id} not found`);
+    if (request.status !== 'pending') throw new BadRequestException('This onboarding request has already been processed');
+    const duplicateCollege = this.collegesService.findAll().some((college) =>
+      college.code.toLowerCase() === request.collegeCode.toLowerCase()
+      || college.email.toLowerCase() === request.collegeEmail.toLowerCase()
+      || college.name.trim().toLowerCase() === request.collegeName.trim().toLowerCase(),
+    );
+    if (duplicateCollege) throw new BadRequestException('A college with the same name, code, or email already exists');
+    if (this.usersRepo.findByEmail(request.contactEmail)) {
+      throw new BadRequestException('A user with the contact email already exists');
+    }
+
+    const college = this.collegesService.create({
+      name: request.collegeName,
+      code: request.collegeCode,
+      email: request.collegeEmail,
+      phone: request.collegePhone,
+      address: request.collegeAddress,
+      website: request.collegeWebsite,
+    });
+    const tier = body.tier ?? 'basic';
+    if (tier !== 'basic') this.superAdminService.changeSubscriptionTier(college.id, tier);
+    const admin = this.superAdminService.createCollegeAdmin(college.id, {
+      name: request.contactName,
+      email: request.contactEmail,
+    });
+    this.onboardingRequests.update(id, {
+      status: 'approved', reviewedAt: new Date().toISOString(), reviewNote: body.note || 'Approved',
+      createdCollegeId: college.id, createdAdminId: admin.id,
+    });
+    this.log(user, 'Onboarding Approved', `${request.collegeName} approved; ${request.contactName} assigned as college admin`, 'college', college.id);
+    return { message: `College "${request.collegeName}" created with admin "${request.contactName}".`, collegeId: college.id, adminId: admin.id };
+  }
+
+  @Patch('onboarding-requests/:id/reject')
+  @ApiOperation({ summary: 'Reject a college onboarding request' })
+  rejectOnboarding(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: ReviewOnboardingDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    const request = this.onboardingRequests.findById(id);
+    if (!request) throw new NotFoundException(`Onboarding request ${id} not found`);
+    if (request.status !== 'pending') throw new BadRequestException('This onboarding request has already been processed');
+    if (!body.note?.trim()) throw new BadRequestException('Please provide a reason for rejection');
+
+    this.onboardingRequests.update(id, { status: 'rejected', reviewedAt: new Date().toISOString(), reviewNote: body.note.trim() });
+    this.log(user, 'Onboarding Rejected', `${request.collegeName} rejected: ${body.note.trim()}`, 'college');
+    return { message: `Request from "${request.collegeName}" rejected.` };
   }
 }

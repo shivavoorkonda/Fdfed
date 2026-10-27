@@ -38,6 +38,13 @@ class ChangePasswordDto {
   @IsString() @MinLength(3) newPassword: string;
 }
 
+/** Development reset flow. Production deployments should replace this with a
+ * time-limited token sent through the organisation's verified email provider. */
+class ForgotPasswordDto {
+  @IsEmail() email: string;
+  @IsString() @MinLength(3) newPassword: string;
+}
+
 @ApiTags('Users')
 @ApiSecurity('x-role')
 @UseGuards(RolesGuard)
@@ -139,6 +146,15 @@ export class UsersController {
       });
     }
     return { ...user, accessToken: this.sessions.create(user.id) };
+  }
+
+  @Post('forgot-password')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset a password using the registered account email (demo environment)' })
+  @ApiBody({ schema: { example: { email: 'c@gmail.com', newPassword: 'newSecret1' } } })
+  forgotPassword(@Body() body: ForgotPasswordDto) {
+    return this.usersService.resetPasswordByEmail(body.email, body.newPassword);
   }
 
   /** Change own password (current password must match) */

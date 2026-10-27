@@ -203,6 +203,13 @@
   color: #6B7280;
 }
 
+.cn-login .forgot-password-btn { align-self: flex-end; padding: 0; border: 0; background: none; color: var(--brand-color); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.cn-login .forgot-password-btn:hover { text-decoration: underline; }
+.cn-login .forgot-password-backdrop { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(15, 23, 42, .56); }
+.cn-login .forgot-password-modal { position: relative; width: min(100%, 410px); display: flex; flex-direction: column; gap: 10px; padding: 30px; border-radius: 18px; background: #fff; box-shadow: 0 24px 56px rgba(15, 23, 42, .3); }
+.cn-login .forgot-password-modal h2 { margin: 0; color: #111827; font-size: 21px; }.cn-login .forgot-password-modal > p { margin: 0 0 8px; color: #6B7280; font-size: 13px; line-height: 1.5; }.cn-login .forgot-password-modal label { color: #374151; font-size: 13px; font-weight: 600; }.cn-login .forgot-password-modal input { width: 100%; padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 9px; font: inherit; outline: none; }.cn-login .forgot-password-modal input:focus { border-color: var(--brand-color); }.cn-login .forgot-password-close { position: absolute; top: 10px; right: 14px; border: 0; background: none; color: #6B7280; font-size: 26px; cursor: pointer; }.cn-login .forgot-password-message { color: #b91c1c !important; font-weight: 600; }
+.cn-login .forgot-password-step { color: var(--brand-color); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }.cn-login .forgot-password-actions { display: flex; gap: 10px; align-items: center; }.cn-login .forgot-password-actions .login-btn { flex: 1; }.cn-login .forgot-password-back { border: 0; background: none; color: #6B7280; font: inherit; font-weight: 600; cursor: pointer; }.cn-login .forgot-password-success { color: #15803d !important; font-weight: 600; }
+
 
 /* =========================================================
    LOGIN BUTTON
@@ -333,6 +340,10 @@
   display: flex;
   justify-content: center;
 }
+
+.cn-login .recruiter-contact-link { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; color: #6B7280; font-size: 12px; }
+.cn-login .recruiter-contact-link a { color: var(--brand-color); font-weight: 700; text-decoration: none; }
+.cn-login .recruiter-contact-link a:hover { text-decoration: underline; }
 
 
 /* =========================================================
