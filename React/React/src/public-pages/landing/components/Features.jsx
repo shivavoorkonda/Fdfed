@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+
 import { featureData } from "../data/featureData";
 
 const roles = [
@@ -25,8 +26,9 @@ const roles = [
 ];
 
 function Features() {
-  const [activeRole, setActiveRole] =
-    useState("candidate");
+  const [{ activeRole }, { setActiveRole }] = useViewState('publicPages', 'Features', () => ({
+    activeRole: "candidate",
+  }));
 
   const selected = featureData[activeRole];
 

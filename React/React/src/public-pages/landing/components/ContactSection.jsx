@@ -1,5 +1,6 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import api, { errorMessage } from "../../../services/api.js";
 
 const EMPTY = { name: "", company: "", role: "", email: "", phone: "", collegeId: "", message: "" };
@@ -18,10 +19,15 @@ function validate(f) {
 }
 
 function ContactSection() {
-  const [form, setForm] = useState(EMPTY);
-  const [colleges, setColleges] = useState([]);
-  const [touched, setTouched] = useState({});
-  const [status, setStatus] = useState({ state: "idle", text: "" });
+  const [
+    { form, colleges, touched, status },
+    { setForm, setColleges, setTouched, setStatus },
+  ] = useViewState('publicPages', 'ContactSection', () => ({
+    form: EMPTY,
+    colleges: [],
+    touched: {},
+    status: { state: "idle", text: "" },
+  }));
 
   useEffect(() => {
     api.get("/contact/colleges").then(({ data }) => setColleges(data)).catch(() => {});

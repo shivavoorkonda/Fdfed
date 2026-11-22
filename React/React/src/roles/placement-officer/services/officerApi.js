@@ -1,7 +1,11 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { toOversightUser } from '../../../shared/utils/accountDirectory.js';
-export { toOversightUser } from '../../../shared/utils/accountDirectory.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import api from '../../../services/api.js';
+import store from '../../../store/index.js';
+import { placementOfficerActions, selectOfficerSnapshot } from '../../../store/placement-officer/placementOfficerSlice.js';
+import { selectWorkspaceVersion } from '../../../store/sessionSlice.js';
 
 // Placement officer screens consume a shared live snapshot built from backend APIs.
 
@@ -15,31 +19,9 @@ const BRANCH_COLORS = [
 ];
 const AVATAR_COLORS = ['#7C3AED', '#4f46e5', '#f59e0b', '#ec4899', '#10b981', '#3b82f6'];
 
-const EMPTY = () => ({
-  stats: {
-    totalCandidates: 0, placementRate: 0, highestPkg: 0, companiesVisited: 0, totalApps: 0,
-    avgPkg: 0, studentsPlaced: 0, offersMade: 0, internships: 0, pending: 0, published: 0, totalOpps: 0, totalApplicants: 0,
-  },
-  stakeholders: { candidates: 0, recruiters: 0, activeDrives: 0, alumni: 0 },
-  branches: [],
-  topCompanies: [],
-  monthlyTrend: [],
-  trend: { labels: [], fullTime: [], internships: [] },
-  submissions: [],
-  drives: [],
-  interviews: [],
-  recruiters: [],
-  announcements: [],
-  users: [],
-  applications: [],
-  notifications: [],
-});
-
 const hash = (text = '') => [...text].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
 
-export const OFFER_STATUSES = ['Offer', 'Offered'];
-
-export function toSubmission(o, applicantCount) {
+function toSubmission(o, applicantCount) {
   return {
     id: o.id,
     jobId: o.jobId,
@@ -73,23 +55,7 @@ export function toSubmission(o, applicantCount) {
   };
 }
 
-// Reverse of the edit form: the screen edits strings, the API wants typed fields.
-export function fromSubmissionEdit(form) {
-  return {
-    title: form.title,
-    company: form.company,
-    type: form.type === 'internship' ? 'Internship' : 'Full-Time',
-    salary: form.pkg,
-    location: form.location,
-    cgpa: form.cgpa !== '' ? Number(form.cgpa) : undefined,
-    branches: form.branches ? form.branches.split(',').map((b) => b.trim()).filter(Boolean) : undefined,
-    backlogs: form.backlogs,
-    deadline: form.deadline,
-    description: form.desc,
-  };
-}
-
-export function toTrackedApplication(a) {
+function toTrackedApplication(a) {
   return {
     id: a.id,
     candidateId: a.candidateId,
@@ -104,28 +70,6 @@ export function toTrackedApplication(a) {
     interviewDate: a.interviewDate || '',
     remarks: a.remarks || '',
   };
-}
-
-export function fromOversightUser(u) {
-  const base = { name: u.name, email: u.email, status: u.status };
-  if (u.role === 'candidate') {
-    return {
-      ...base,
-      rollNumber: u.roll,
-      department: u.branch,
-      cgpa: Number.isFinite(Number(u.cgpa)) ? Number(u.cgpa) : 0,
-      backlogs: Number.isInteger(Number(u.backlogs)) ? Number(u.backlogs) : 0,
-    };
-  }
-  if (u.role === 'alumni') {
-    return {
-      ...base,
-      company: u.company,
-      batch: u.batch,
-      referrals: Number.isInteger(Number(u.referrals)) ? Number(u.referrals) : 0,
-    };
-  }
-  return { ...base, company: u.recCompany, headline: u.recDesignation, phone: u.recPhone, location: u.recLocation };
 }
 
 function build({ opps, apps, users, recruiters, placement, assessments = [], announcements = [], inbox = [] }) {
@@ -235,27 +179,16 @@ function build({ opps, apps, users, recruiters, placement, assessments = [], ann
 }
 
 let inflight = null;
-// The officer portal is a small single-page application, but several mounted
-// components (the header and the current page) read the same dashboard data.
-// Keep one live snapshot and notify every consumer after a mutation so an
-// approve/publish/reject action never leaves another part of the portal stale.
-let currentData = EMPTY();
-const subscribers = new Set();
-
-function publish(data) {
-  currentData = data;
-  subscribers.forEach((subscriber) => subscriber(data));
-}
-
 function normaliseOpportunityStatus(status) {
   const value = String(status || '').toLowerCase();
   return value === 'published' ? 'published' : value;
 }
 
 /** Share concurrent reads, then discard the request so page changes fetch fresh data. */
-export function loadOfficerData({ force = false } = {}) {
-  if (!force && inflight) return inflight;
-  inflight = Promise.all([
+function loadOfficerData({ force = false } = {}) {
+  const version = selectWorkspaceVersion(store.getState());
+  if (!force && inflight?.version === version) return inflight.request;
+  const request = Promise.all([
     api.get('/opportunities'),
     api.get('/applications'),
     api.get('/users/oversight'),
@@ -275,44 +208,52 @@ export function loadOfficerData({ force = false } = {}) {
       announcements,
       inbox,
     });
-    publish(data);
+    if (selectWorkspaceVersion(store.getState()) === version) {
+      store.dispatch(placementOfficerActions.snapshotLoaded(data));
+    }
     return data;
   });
-  const request = inflight;
-  const clear = () => { if (inflight === request) inflight = null; };
+  inflight = { version, request };
+  const clear = () => { if (inflight?.request === request) inflight = null; };
   request.then(clear, clear);
-  return inflight;
+  return request;
 }
 
 /** Hook: returns the loaded data (or empty values until it arrives) and a refresh function. */
 export function useOfficerData() {
-  const [state, setState] = useState({ data: currentData, ready: false, error: '' });
+  const { data, revision } = useSelector(selectOfficerSnapshot);
+  const [{ initialRevision, failedRevision }, { setFailedRevision }] = useViewState(
+    'placementOfficer', 'useOfficerData', () => ({ initialRevision: revision, failedRevision: null }),
+  );
+
+  const recordFailure = useCallback(() => {
+    setFailedRevision(selectOfficerSnapshot(store.getState()).revision);
+  }, [setFailedRevision]);
+
   const refresh = useCallback(async () => {
     try {
-      const data = await loadOfficerData({ force: true });
-      setState({ data, ready: true, error: '' });
-      return data;
-    } catch (error) {
-      setState((prev) => ({ ...prev, error: 'Could not load data from the server.' }));
+      return await loadOfficerData({ force: true });
+    } catch {
+      recordFailure();
       return null;
     }
-  }, []);
+  }, [recordFailure]);
+
   useEffect(() => {
     let cancelled = false;
-    const receive = (data) => {
-      if (!cancelled) setState({ data, ready: true, error: '' });
-    };
-    subscribers.add(receive);
     const onFocus = () => { loadOfficerData({ force: true }).catch(() => {}); };
     window.addEventListener('focus', onFocus);
-    loadOfficerData()
-      .then((data) => { if (!cancelled) setState({ data, ready: true, error: '' }); })
-      .catch(() => { if (!cancelled) setState((prev) => ({ ...prev, error: 'Could not load data from the server.' })); });
+    loadOfficerData().catch(() => { if (!cancelled) recordFailure(); });
     return () => {
       cancelled = true;
       window.removeEventListener('focus', onFocus);
-      subscribers.delete(receive);
     };
-  }, []);
-  return { ...state, refresh };
+  }, [recordFailure]);
+
+  return {
+    data,
+    ready: revision !== initialRevision,
+    error: revision === failedRevision ? 'Could not load data from the server.' : '',
+    refresh,
+  };
 }

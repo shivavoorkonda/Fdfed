@@ -1,5 +1,6 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog, confirmDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Megaphone, Plus, Clock, CheckCircle, Info, AlertTriangle,
   X, RefreshCw, XCircle
@@ -26,9 +27,14 @@ const TYPE_ICON = {
 };
 
 function AddAnnouncementModal({ onClose, onSave }) {
-  const [form, setForm]     = useState({ title: '', message: '', type: 'general' });
-  const [error, setError]   = useState('');
-  const [saving, setSaving] = useState(false);
+  const [
+    { form, error, saving },
+    { setForm, setError, setSaving },
+  ] = useViewState('collegeAdmin', 'AddAnnouncementModal', () => ({
+    form: { title: '', message: '', type: 'general' },
+    error: '',
+    saving: false,
+  }));
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = async () => {
@@ -102,10 +108,15 @@ function AddAnnouncementModal({ onClose, onSave }) {
 
 export default function Announcements({ collegeName }) {
   const { getAnnouncements, postAnnouncement, deleteAnnouncement } = usePlatformData();
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading]             = useState(true);
-  const [err, setErr]                     = useState('');
-  const [showAdd, setShowAdd]             = useState(false);
+  const [
+    { announcements, loading, err, showAdd },
+    { setAnnouncements, setLoading, setErr, setShowAdd },
+  ] = useViewState('collegeAdmin', 'Announcements', () => ({
+    announcements: [],
+    loading: true,
+    err: '',
+    showAdd: false,
+  }));
 
   const load = () => {
     setLoading(true);

@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext.jsx';
-import { UIProvider } from './context/UIContext.jsx';
 import GlobalModals from './components/GlobalModals.jsx';
 import Layout from './components/Layout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -16,7 +15,7 @@ import './styles/style.css';
 // so every path below is relative to "/candidate".
 function CandidateRoutes() {
     return (
-        <UIProvider>
+        <>
             <Routes>
                 <Route element={<Layout />}>
                     <Route index element={<Dashboard />} />
@@ -30,7 +29,7 @@ function CandidateRoutes() {
                 </Route>
             </Routes>
             <GlobalModals />
-        </UIProvider>
+        </>
     );
 }
 

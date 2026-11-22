@@ -4,14 +4,11 @@
 .cn-candidate .profile-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
 .cn-candidate .profile-card { background-color: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.03); overflow: hidden; margin-bottom: 24px; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: relative; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 .cn-candidate .profile-header-banner { height: 180px; background: linear-gradient(120deg, var(--brand-tertiary), #a855f7); position: relative; background-size: cover; background-position: center; }
-.cn-candidate .edit-banner-btn { position: absolute; top: 16px; right: 16px; background: white; color: var(--brand-primary); border: none; padding: 8px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 .cn-candidate .profile-picture-container { position: absolute; bottom: -50px; left: 40px; width: 140px; height: 140px; border-radius: 50%; background-color: var(--blue-dark); border: 4px solid var(--bg-card); display: flex; align-items: center; justify-content: center; color: white; font-size: 50px; font-weight: 700; box-shadow: var(--shadow-lg); cursor: pointer; background-size: cover; background-position: center; }
 
 /* Header Details */
 .cn-candidate .profile-header-details { padding: 64px 40px 32px 40px; }
 .cn-candidate .profile-header-actions { position: absolute; top: 200px; right: 40px; }
-.cn-candidate .profile-name-row { display: flex; justify-content: space-between; align-items: flex-start; }
-.cn-candidate .profile-name-row h2 { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
 .cn-candidate .profile-headline { font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; font-weight: 500;}
 
 .cn-candidate .profile-contact-list { display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px; color: #64748b; margin-bottom: 16px;}
@@ -63,7 +60,6 @@
 .cn-candidate .drag-drop-box p { font-size: 13px; color: #94a3b8; }
 
 .cn-candidate .file-upload-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); margin-bottom: 24px; }
-.cn-candidate .file-info { display: flex; align-items: center; gap: 16px; }
 .cn-candidate .file-icon { width: 44px; height: 44px; background: #fee2e2; color: #ef4444; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; }
 .cn-candidate .file-details h5 { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
 .cn-candidate .file-details p { font-size: 12px; color: #64748b; }

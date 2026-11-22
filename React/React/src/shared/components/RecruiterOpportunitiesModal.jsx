@@ -1,5 +1,6 @@
+import { useViewState } from '../../store/useViewState.js';
 import "./AppDialog.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import api, { errorMessage } from "../../services/api.js";
 
 const statusStyle = {
@@ -12,9 +13,14 @@ const statusStyle = {
 
 export default function RecruiterOpportunitiesModal({ recruiter, onClose }) {
   const dialog = useRef(null);
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [
+    { jobs, loading, error },
+    { setJobs, setLoading, setError },
+  ] = useViewState('workspace', 'RecruiterOpportunitiesModal', () => ({
+    jobs: [],
+    loading: true,
+    error: "",
+  }));
   useEffect(() => {
     dialog.current.showModal();
     const node = dialog.current;

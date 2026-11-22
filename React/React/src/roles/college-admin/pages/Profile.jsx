@@ -1,7 +1,10 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Building2, ExternalLink, Mail, Shield, User } from 'lucide-react';
-import api, { errorMessage, readSession } from '../../../services/api.js';
+import { useSelector } from 'react-redux';
+import api, { errorMessage } from '../../../services/api.js';
+import { selectSession } from '../../../store/sessionSlice.js';
 import ChangePasswordModal from '../../../shared/components/ChangePasswordModal.jsx';
 
 const EMPTY_EDIT_FIELDS = {
@@ -9,14 +12,19 @@ const EMPTY_EDIT_FIELDS = {
 };
 
 export default function Profile({ collegeName, showToast, onProfileUpdated }) {
-  const session = readSession() || {};
-  const [profile, setProfile] = useState(null);
-  const [collegeInfo, setCollegeInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editFields, setEditFields] = useState(EMPTY_EDIT_FIELDS);
-  const [saving, setSaving] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const session = useSelector(selectSession) || {};
+  const [
+    { profile, collegeInfo, loading, isEditing, editFields, saving, isChangePasswordOpen },
+    { setProfile, setCollegeInfo, setLoading, setIsEditing, setEditFields, setSaving, setIsChangePasswordOpen },
+  ] = useViewState('collegeAdmin', 'Profile', () => ({
+    profile: null,
+    collegeInfo: null,
+    loading: true,
+    isEditing: false,
+    editFields: EMPTY_EDIT_FIELDS,
+    saving: false,
+    isChangePasswordOpen: false,
+  }));
 
   useEffect(() => {
     let active = true;
@@ -82,8 +90,7 @@ export default function Profile({ collegeName, showToast, onProfileUpdated }) {
       });
       setProfile(updated);
       const nextSession = { ...session, name: updated.name, email: updated.email };
-      localStorage.setItem('loggedInUser', JSON.stringify(nextSession));
-      onProfileUpdated?.(nextSession);
+      if (onProfileUpdated?.(nextSession) === false) return;
       setIsEditing(false);
       showToast?.('Profile updated successfully!');
     } catch (error) {

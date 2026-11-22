@@ -1,5 +1,6 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './styles/p1.css';
@@ -13,17 +14,27 @@ const DEPT_CODES = {
 const deptCode = (name = '') => DEPT_CODES[name.trim().toLowerCase()] || name;
 
 export default function CandidatesFilter({ onNavigate, activePage = 'candidates-filter' }) {
-  const [candidates, setCandidates] = useState([]);
-  const [loadError, setLoadError] = useState('');
+  const [
+    { candidates, loadError },
+    { setCandidates, setLoadError },
+  ] = useViewState('placementOfficer', 'CandidatesFilter', () => ({
+    candidates: [],
+    loadError: '',
+  }));
 
   useEffect(() => {
     api.get('/features/officer/candidates/filter')
       .then(({ data }) => setCandidates(data.map((c) => ({ ...c, dept: deptCode(c.dept) }))))
       .catch((error) => setLoadError(errorMessage(error, 'Could not load candidates.')));
   }, []);
-  const [dept, setDept] = useState('');
-  const [minCgpa, setMinCgpa] = useState('');
-  const [maxBacklogs, setMaxBacklogs] = useState('');
+  const [
+    { dept, minCgpa, maxBacklogs },
+    { setDept, setMinCgpa, setMaxBacklogs },
+  ] = useViewState('placementOfficer', 'CandidatesFilter/dept', () => ({
+    dept: '',
+    minCgpa: '',
+    maxBacklogs: '',
+  }));
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter((c) => {
@@ -65,7 +76,7 @@ export default function CandidatesFilter({ onNavigate, activePage = 'candidates-
     <div className="frame">
       <Sidebar activePage={activePage} onNavigate={onNavigate} />
 
-      <Header title="Candidate Filter ⭐" onNavigate={onNavigate} />
+      <Header title="Candidate Filter " onNavigate={onNavigate} />
 
       <main className="main-content" id="mainContent" style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px 20px' }}>
         {loadError && (

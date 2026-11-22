@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { PLACEMENT_PAGE_KEY, PLACEMENT_PAGES, placementOfficerActions, selectPlacementPage } from '../../store/placement-officer/placementOfficerSlice.js';
 import './components/styles/p1.css';
 import './components/styles/layout-fixes.css';
 import Dashboard from './components/Dashboard';
@@ -9,19 +11,17 @@ import UserOversight from './components/UserOversight';
 import AppTracking from './components/AppTracking';
 import BulkNotify from './components/BulkNotify';
 import Profile from './components/Profile';
-import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
-
-const PLACEMENT_PAGES = ['p1', 'dashboard', 'p2', 'review', 'p3', 'statistics', 'placement-dashboard', 'dept-report', 'p4', 'recruiters', 'p5', 'oversight', 'p6', 'tracking', 'bulk-notify', 'profile'];
-const PLACEMENT_PAGE_KEY = 'cn_active_placement_page';
+import { savePage } from '../../shared/utils/navigationState.js';
 
 export default function PlacementApp() {
-  const [currentPage, setCurrentPage] = useState(() => readSavedPage(PLACEMENT_PAGE_KEY, 'p1', PLACEMENT_PAGES));
+  const dispatch = useDispatch();
+  const currentPage = useSelector(selectPlacementPage);
   const navigateTo = useCallback((page) => {
     const nextPage = PLACEMENT_PAGES.includes(page) ? page : 'p1';
     savePage(PLACEMENT_PAGE_KEY, nextPage);
-    setCurrentPage(nextPage);
+    dispatch(placementOfficerActions.pageChanged(nextPage));
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-  }, []);
+  }, [dispatch]);
 
   const renderCurrentPage = () => {
     switch (currentPage) {

@@ -1,5 +1,5 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState } from 'react';
 import { LocationAdder, SkillAdder, BranchSelector } from './OpportunityFields.jsx';
 import { getTodayStr, getMaxDeadlineStr, validateTitle, validateCtcLpa, validateInternComp, validateCgpa, validateDeadline } from '../data/opportunityValidation.js';
 
@@ -21,16 +21,21 @@ function isDuplicate(existingOpportunities, title, type) {
 // ── Full-Time Form ────────────────────────────────────────────────────────────
 
 function FullTimeForm({ onAddOpportunity, setActiveTab, existingOpportunities }) {
-  const [jobId, setJobId] = useState('');
-  const [title, setTitle] = useState('');
-  const [locations, setLocations] = useState([]);
-  const [ctcLpa, setCtcLpa] = useState('');
-  const [cgpa, setCgpa] = useState('');
-  const [deadline, setDeadline] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedBranches, setSelectedBranches] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [
+    { jobId, title, locations, ctcLpa, cgpa, deadline, description, selectedBranches, skills, errors },
+    { setJobId, setTitle, setLocations, setCtcLpa, setCgpa, setDeadline, setDescription, setSelectedBranches, setSkills, setErrors },
+  ] = useViewState('recruiter', 'FullTimeForm', () => ({
+    jobId: '',
+    title: '',
+    locations: [],
+    ctcLpa: '',
+    cgpa: '',
+    deadline: '',
+    description: '',
+    selectedBranches: [],
+    skills: [],
+    errors: {},
+  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -169,17 +174,22 @@ function FullTimeForm({ onAddOpportunity, setActiveTab, existingOpportunities })
 // ── Internship Form ───────────────────────────────────────────────────────────
 
 function InternshipForm({ onAddOpportunity, setActiveTab, existingOpportunities }) {
-  const [jobId, setJobId] = useState('');
-  const [title, setTitle] = useState('');
-  const [locations, setLocations] = useState([]);
-  const [duration, setDuration] = useState('');
-  const [compensation, setCompensation] = useState('');
-  const [cgpa, setCgpa] = useState('');
-  const [deadline, setDeadline] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedBranches, setSelectedBranches] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [
+    { jobId, title, locations, duration, compensation, cgpa, deadline, description, selectedBranches, skills, errors },
+    { setJobId, setTitle, setLocations, setDuration, setCompensation, setCgpa, setDeadline, setDescription, setSelectedBranches, setSkills, setErrors },
+  ] = useViewState('recruiter', 'InternshipForm', () => ({
+    jobId: '',
+    title: '',
+    locations: [],
+    duration: '',
+    compensation: '',
+    cgpa: '',
+    deadline: '',
+    description: '',
+    selectedBranches: [],
+    skills: [],
+    errors: {},
+  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -331,7 +341,9 @@ function InternshipForm({ onAddOpportunity, setActiveTab, existingOpportunities 
 // ── Main PostOpportunity wrapper ──────────────────────────────────────────────
 
 export default function PostOpportunity({ onAddOpportunity, setActiveTab, existingOpportunities = [] }) {
-  const [jobType, setJobType] = useState('Full-Time');
+  const [{ jobType }, { setJobType }] = useViewState('recruiter', 'PostOpportunity', () => ({
+    jobType: 'Full-Time',
+  }));
 
   return (
     <div className="form-container-card">

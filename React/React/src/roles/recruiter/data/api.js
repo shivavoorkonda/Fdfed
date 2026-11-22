@@ -4,7 +4,7 @@ import api from '../../../services/api.js';
 
 const initialsOf = (name = '') => name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 
-export const toOpportunity = (o) => ({
+const toOpportunity = (o) => ({
   id: o.id,
   jobId: o.jobId || `JOB-${o.id}`,
   title: o.title,
@@ -40,7 +40,7 @@ export const fromOpportunity = (o, extra = {}) => ({
   ...extra,
 });
 
-export const toApplication = (a) => ({
+const toApplication = (a) => ({
   id: a.id,
   opportunityId: a.opportunityId,
   jobId: a.jobId,
@@ -74,7 +74,7 @@ export const toApplication = (a) => ({
   timeline: a.timeline || [],
 });
 
-export const toAssessment = (a) => ({ ...a });
+const toAssessment = (a) => ({ ...a });
 
 export const fetchRecruiterData = async () => {
   const [opps, apps, assessments, notifications] = await Promise.all([

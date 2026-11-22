@@ -1,38 +1,29 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-const ThemeContext = createContext({
-  theme: "dark",
-  toggleTheme: () => {},
-  isDark: true,
-});
+import { useEffect, useLayoutEffect } from "react";
+import { useDispatch, useSelector, useStore } from "react-redux";
+import { readTheme, selectTheme, themeLoaded, themeToggled } from "../../../store/publicSlice.js";
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("careernest-theme");
-    return saved === "light" || saved === "dark" ? saved : "dark";
-  });
+  const dispatch = useDispatch();
+  const store = useStore();
+  const theme = useSelector(selectTheme);
+
+  useLayoutEffect(() => {
+    dispatch(themeLoaded(readTheme()));
+  }, [dispatch]);
 
   useEffect(() => {
+    // Hydration may have selected a different saved theme before this effect runs.
+    if (selectTheme(store.getState()) !== theme) return;
     document.documentElement.setAttribute("data-theme", theme);
     document.body.setAttribute("data-theme", theme);
     localStorage.setItem("careernest-theme", theme);
-  }, [theme]);
+  }, [store, theme]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === "dark" }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return children;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
+  const dispatch = useDispatch();
+  const theme = useSelector(selectTheme);
+  return { theme, toggleTheme: () => dispatch(themeToggled()), isDark: theme === "dark" };
 }

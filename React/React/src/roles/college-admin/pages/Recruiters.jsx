@@ -1,14 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+import { useCallback, useEffect } from "react";
 import api, { errorMessage } from "../../../services/api.js";
 import RecruiterOpportunitiesModal from "../../../shared/components/RecruiterOpportunitiesModal.jsx";
 import { confirmDialog, infoDialog } from "../../../shared/components/AppDialog.jsx";
 
 export default function Recruiters() {
-  const [recruiters, setRecruiters] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [removingId, setRemovingId] = useState(null);
+  const [
+    { recruiters, selectedId, error, loading, removingId },
+    { setRecruiters, setSelectedId, setError, setLoading, setRemovingId },
+  ] = useViewState('collegeAdmin', 'Recruiters', () => ({
+    recruiters: [],
+    selectedId: null,
+    error: "",
+    loading: true,
+    removingId: null,
+  }));
+  const selected = recruiters.find((recruiter) => recruiter.id === selectedId);
   const loadRecruiters = useCallback(async () => {
     try {
       const { data } = await api.get('/recruiters');
@@ -63,7 +70,7 @@ export default function Recruiters() {
                   <td>
                     <button
                       className="btn btn-ghost"
-                      onClick={() => setSelected(recruiter)}
+                      onClick={() => setSelectedId(recruiter.id)}
                     >
                       {recruiter.name}
                     </button>
@@ -73,7 +80,7 @@ export default function Recruiters() {
                   <td>
                     <button
                       className="btn btn-outline"
-                      onClick={() => setSelected(recruiter)}
+                      onClick={() => setSelectedId(recruiter.id)}
                     >
                       View Opportunities ({recruiter.opps})
                     </button>
@@ -94,7 +101,7 @@ export default function Recruiters() {
         <RecruiterOpportunitiesModal
           key={selected.id}
           recruiter={selected}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
         />
       )}
     </section>

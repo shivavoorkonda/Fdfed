@@ -59,13 +59,6 @@
     color: #ffffffcc;
     font-size: 13px;
 }
-.cn-placement .sidebar-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 24px;
-    border-bottom: 0.8px solid #ffffff1a;
-}
 .cn-placement .sidebar-avatar {
     width: 40px;
     height: 40px;
@@ -77,18 +70,6 @@
     flex-shrink: 0;
     font-weight: 600;
     font-size: 14px;
-}
-.cn-placement .sidebar-user-info {
-    display: flex;
-    flex-direction: column;
-}
-.cn-placement .sidebar-user-name {
-    font-weight: 500;
-    font-size: 15px;
-}
-.cn-placement .sidebar-user-email {
-    color: #ffffffb2;
-    font-size: 12px;
 }
 .cn-placement .sidebar-nav {
     list-style: none;
@@ -488,29 +469,6 @@
     display: block;
     margin: 0 auto 10px;
 }
-.cn-placement .search-shortcut {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: #9ca3af;
-    margin-left: 6px;
-}
-.cn-placement .search-shortcut kbd {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 22px;
-    height: 20px;
-    padding: 0 5px;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    color: #6b7280;
-}
 
 /* ── Main Content ── */
 .cn-placement .main-content {
@@ -825,78 +783,6 @@
 .cn-placement .status-badge.rejected  { background: #fee2e2; color: #dc2626; }
 
 /* ── Small Action Buttons (for tables) ── */
-.cn-placement .btn-edit-sm {
-    all: unset;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-right: 6px;
-}
-.cn-placement .btn-edit-sm:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
-}
-.cn-placement .btn-delete-sm {
-    all: unset;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 14px;
-    border: 1px solid #fca5a5;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #dc2626;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.cn-placement .btn-delete-sm:hover {
-    background: #fef2f2;
-    border-color: #ef4444;
-}
-.cn-placement .btn-approve-sm {
-    all: unset;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 14px;
-    background: #16a34a;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s;
-    margin-right: 6px;
-}
-.cn-placement .btn-approve-sm:hover {
-    background: #15803d;
-}
-.cn-placement .btn-decline-sm {
-    all: unset;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 14px;
-    background: #dc2626;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.cn-placement .btn-decline-sm:hover {
-    background: #b91c1c;
-}
 
 /* ── Notification Dropdown ── */
 .cn-placement .notif-wrapper {

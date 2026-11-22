@@ -1,15 +1,22 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneInputProps } from '../../../shared/utils/phone.js';
 import ChangePasswordModal from '../../../shared/components/ChangePasswordModal.jsx';
-import { readSession } from '../../../services/api.js';
-import React, { useState } from 'react';
-import { User, Building, Mail, Phone, MapPin, Edit3, Check, AlertCircle } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { selectSession } from '../../../store/sessionSlice.js';
+import { Edit3, AlertCircle } from 'lucide-react';
 
 export default function Profile({ recruiter, onUpdateProfile }) {
-  const [passwordOpen, setPasswordOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ ...recruiter });
-  const [errors, setErrors] = useState({});
+  const userId = useSelector(selectSession)?.id;
+  const [
+    { passwordOpen, saving, isEditing, formData, errors },
+    { setPasswordOpen, setSaving, setIsEditing, setFormData, setErrors },
+  ] = useViewState('recruiter', 'Profile', () => ({
+    passwordOpen: false,
+    saving: false,
+    isEditing: false,
+    formData: { ...recruiter },
+    errors: {},
+  }));
 
   const validate = (data = formData) => {
     const errs = {};
@@ -99,7 +106,7 @@ export default function Profile({ recruiter, onUpdateProfile }) {
       </div>
 
       <button className="btn-secondary-action" style={{marginBottom:16}} onClick={() => setPasswordOpen(true)}>Change Password</button>
-      <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} userId={readSession()?.id} accentColor="#0f8f63" />
+      <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} userId={userId} accentColor="#0f8f63" />
       <div className="profile-card-full">
         <div className="profile-top-wrap">
           <div className="profile-avatar-large">

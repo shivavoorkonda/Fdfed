@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 
 export default function DeclineModal({ isOpen, candidateName, onClose, onConfirm }) {
-  const [reason, setReason] = useState('');
-  const [error, setError] = useState('');
+  const [{ reason, error }, { setReason, setError }] = useViewState('alumni', 'DeclineModal', () => ({
+    reason: '',
+    error: '',
+  }));
 
   if (!isOpen) return null;
 

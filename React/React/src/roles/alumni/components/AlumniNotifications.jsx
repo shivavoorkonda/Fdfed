@@ -1,9 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import api from '../../../services/api.js';
 
 export default function AlumniNotifications() {
-  const [notifications, setNotifications] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [
+    { notifications, isOpen },
+    { setNotifications, setIsOpen },
+  ] = useViewState('alumni', 'AlumniNotifications', () => ({
+    notifications: [],
+    isOpen: false,
+  }));
 
   const loadNotifications = async () => {
     try {

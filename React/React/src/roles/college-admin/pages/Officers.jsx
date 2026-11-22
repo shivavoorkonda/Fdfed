@@ -1,13 +1,15 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
 import { collegeEmailDomain, collegeEmailError } from '../../../shared/utils/collegeEmail.js';
 import { confirmDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState } from 'react';
 import { errorMessage } from '../../../services/api.js';
 import { UserPlus, Trash2, ShieldCheck, Ban, CheckCircle } from 'lucide-react';
 
 function AddOfficerModal({ onClose, onSave, emailDomain }) {
-  const [form, setForm] = useState({ name: '', email: '', department: '', phone: '' });
-  const [error, setError] = useState('');
+  const [{ form, error }, { setForm, setError }] = useViewState('collegeAdmin', 'AddOfficerModal', () => ({
+    form: { name: '', email: '', department: '', phone: '' },
+    error: '',
+  }));
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = () => {
@@ -65,8 +67,10 @@ function AddOfficerModal({ onClose, onSave, emailDomain }) {
 
 export default function Officers({ officers, platform, collegeName, collegeInfo, showToast }) {
   const emailDomain = collegeEmailDomain(collegeInfo);
-  const [showAdd, setShowAdd]     = useState(false);
-  const [filter, setFilter]       = useState('all'); // all | active | inactive
+  const [{ showAdd, filter }, { setShowAdd, setFilter }] = useViewState('collegeAdmin', 'Officers', () => ({
+    showAdd: false,
+    filter: 'all',
+  })); // all | active | inactive
 
   const filteredOfficers = officers.filter(o => {
     if (filter === 'active')   return o.status === 'active';

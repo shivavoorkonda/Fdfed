@@ -1,20 +1,20 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { candidateActions, selectCandidateUI, selectCandidateStore, selectUnreadCandidateNotifications } from '../../../store/candidate/candidateSlice.js';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from './StoreContext.jsx';
+import { useCandidateCommands } from './StoreContext.jsx';
 
-const UIContext = createContext(null);
-
-export function UIProvider({ children }) {
-    const { store, markAllNotificationsRead, markNotificationRead } = useStore();
+export function useUI() {
+    const ui = useSelector(selectCandidateUI);
+    const notifications = useSelector((state) => selectCandidateStore(state).notificationsData);
+    const unreadCount = useSelector(selectUnreadCandidateNotifications);
+    const { markAllNotificationsRead, markNotificationRead } = useCandidateCommands();
     const navigate = useNavigate();
 
-    const [notifOpen, setNotifOpen] = useState(false);
-    const [askQueryOpen, setAskQueryOpen] = useState(false);
-    const [queryMessage, setQueryMessage] = useState('');
-    const [successModal, setSuccessModal] = useState({ open: false, title: 'Success!', message: 'Operation completed.' });
+    const dispatch = useDispatch();
 
-    const toggleNotif = useCallback(() => setNotifOpen((v) => !v), []);
-    const closeNotif = useCallback(() => setNotifOpen(false), []);
+    const toggleNotif = useCallback(() => dispatch(candidateActions.notificationsToggled()), [dispatch]);
+    const closeNotif = useCallback(() => dispatch(candidateActions.notificationsClosed()), [dispatch]);
 
     const markAllRead = useCallback(() => {
         markAllNotificationsRead();
@@ -22,81 +22,31 @@ export function UIProvider({ children }) {
 
     const readAndNavigate = useCallback(
         (idx, route) => {
-            const notification = store.notificationsData[idx];
+            const notification = notifications[idx];
             if (notification) markNotificationRead(notification.id);
-            setNotifOpen(false);
+            closeNotif();
             if (route && route !== '#') navigate(`/candidate/${route.replace('.html', '')}`);
         },
-        [store.notificationsData, markNotificationRead, navigate]
+        [closeNotif, notifications, markNotificationRead, navigate]
     );
 
     const openAskQuery = useCallback((e) => {
         if (e) e.preventDefault();
-        setQueryMessage('');
-        setAskQueryOpen(true);
-    }, []);
+        dispatch(candidateActions.queryOpened());
+    }, [dispatch]);
 
-    const closeAskQuery = useCallback(() => setAskQueryOpen(false), []);
-
-    const submitQuery = useCallback(() => {
-        setAskQueryOpen(false);
-        setQueryMessage('');
-        setSuccessModal({
-            open: true,
-            title: 'Query Sent',
-            message: 'Your query was sent successfully. We will get back to you shortly.',
-        });
-    }, []);
+    const closeAskQuery = useCallback(() => dispatch(candidateActions.queryClosed()), [dispatch]);
+    const setQueryMessage = useCallback((message) => dispatch(candidateActions.queryMessageChanged(message)), [dispatch]);
+    const submitQuery = useCallback(() => dispatch(candidateActions.querySubmitted()), [dispatch]);
 
     const showSuccess = useCallback((title, message) => {
-        setSuccessModal({ open: true, title, message });
-    }, []);
+        dispatch(candidateActions.successOpened({ title, message }));
+    }, [dispatch]);
 
-    const closeSuccess = useCallback(() => setSuccessModal((s) => ({ ...s, open: false })), []);
+    const closeSuccess = useCallback(() => dispatch(candidateActions.successClosed()), [dispatch]);
 
-    const unreadCount = store.notificationsData.filter((n) => !n.isRead).length;
-
-    const value = useMemo(
-        () => ({
-            notifOpen,
-            toggleNotif,
-            closeNotif,
-            markAllRead,
-            readAndNavigate,
-            unreadCount,
-            askQueryOpen,
-            openAskQuery,
-            closeAskQuery,
-            queryMessage,
-            setQueryMessage,
-            submitQuery,
-            successModal,
-            showSuccess,
-            closeSuccess,
-        }),
-        [
-            notifOpen,
-            toggleNotif,
-            closeNotif,
-            markAllRead,
-            readAndNavigate,
-            unreadCount,
-            askQueryOpen,
-            openAskQuery,
-            closeAskQuery,
-            queryMessage,
-            submitQuery,
-            successModal,
-            showSuccess,
-            closeSuccess,
-        ]
-    );
-
-    return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
-}
-
-export function useUI() {
-    const ctx = useContext(UIContext);
-    if (!ctx) throw new Error('useUI must be used within a UIProvider');
-    return ctx;
+    return {
+        ...ui, toggleNotif, closeNotif, markAllRead, readAndNavigate, unreadCount,
+        openAskQuery, closeAskQuery, setQueryMessage, submitQuery, showSuccess, closeSuccess,
+    };
 }

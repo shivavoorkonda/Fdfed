@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import { Activity, Clock, AlertTriangle, RefreshCw, Building2, UserCog, MessageSquare, Settings, Users, Briefcase, FileText, HeartHandshake, Bell, LogIn } from 'lucide-react';
 import { usePlatformData } from '../../../shared/context/PlatformDataContext.jsx';
 import { errorMessage } from '../../../services/api.js';
@@ -33,10 +34,15 @@ const FILTERS = [
 
 export default function ActivityLog() {
   const { getActivityLog } = usePlatformData();
-  const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr]         = useState('');
-  const [filter, setFilter]   = useState('all');
+  const [
+    { entries, loading, err, filter },
+    { setEntries, setLoading, setErr, setFilter },
+  ] = useViewState('superAdmin', 'ActivityLog', () => ({
+    entries: [],
+    loading: true,
+    err: '',
+    filter: 'all',
+  }));
   const { data: platformData } = usePlatformData();
   const collegeName = (id) => (platformData?.colleges || []).find((c) => c.id === id)?.name;
   const shown = entries.filter((e) => filter === 'all' || e.type === filter);

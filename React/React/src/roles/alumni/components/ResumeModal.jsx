@@ -1,19 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import api, { errorMessage } from '../../../services/api.js';
 
 export default function ResumeModal({ isOpen, onClose, candidateName = 'Candidate', candidate = null }) {
-  const [documentUrl, setDocumentUrl] = useState('');
-  const [fileType, setFileType] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [
+    { documentUrl, fileType, error, loading },
+    { setDocumentUrl, setFileType, setError, setLoading },
+  ] = useViewState('alumni', 'ResumeModal', () => ({
+    documentUrl: '',
+    fileType: '',
+    error: '',
+    loading: false,
+  }));
 
   useEffect(() => {
-    if (!isOpen || !candidate?.id) return;
-    let active = true;
-    let url = '';
     setDocumentUrl('');
     setFileType('');
     setError('');
+    if (!isOpen || !candidate?.id) {
+      setLoading(false);
+      return;
+    }
+    let active = true;
+    let url = '';
     setLoading(true);
     api.get(`/applications/referrals/${candidate.id}/resume`, { responseType: 'blob' })
       .then(({ data }) => {

@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import api, { clearSession, readSession } from '../../../services/api.js';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import api from '../../../services/api.js';
+import { useLogout } from '../../../shared/context/AuthContext.jsx';
+import { selectSession } from '../../../store/sessionSlice.js';
 import { useOfficerData } from '../services/officerApi';
 import { officerInitials } from '../utils/officerIdentity.js';
 import SignOutModal from './SignOutModal';
@@ -17,8 +21,11 @@ const PAGES = [
 ];
 
 export default function Header({ title = 'Dashboard', onNavigate, profile }) {
-  const session = readSession() || {};
-  const [officer, setOfficer] = useState(session);
+  const confirmSignOut = useLogout();
+  const session = useSelector(selectSession) || {};
+  const [{ officer }, { setOfficer }] = useViewState('placementOfficer', 'Header', () => ({
+    officer: session,
+  }));
   useEffect(() => {
     if (!session.id) return;
     let active = true;
@@ -31,14 +38,21 @@ export default function Header({ title = 'Dashboard', onNavigate, profile }) {
   const officerEmail = profile?.email || officer.email || session.email || '';
   const officerRole = profile?.role || officer.headline || 'Placement Officer';
   const initials = officerInitials(officerName);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResultsOpen, setSearchResultsOpen] = useState(false);
+  const [
+    { profileOpen, isSignOutOpen, notifOpen, searchQuery, searchResultsOpen },
+    { setProfileOpen, setIsSignOutOpen, setNotifOpen, setSearchQuery, setSearchResultsOpen },
+  ] = useViewState('placementOfficer', 'Header/profileOpen', () => ({
+    profileOpen: false,
+    isSignOutOpen: false,
+    notifOpen: false,
+    searchQuery: '',
+    searchResultsOpen: false,
+  }));
   const { data } = useOfficerData();
   // Notifications are derived from what needs attention; read-state is kept per browser tab.
-  const [readIds, setReadIds] = useState([]);
+  const [{ readIds }, { setReadIds }] = useViewState('placementOfficer', 'Header/readIds', () => ({
+    readIds: [],
+  }));
   const notifications = (data.notifications || []).map(n => ({ ...n, read: n.read || readIds.includes(n.id) }));
 
   const headerRef = useRef(null);
@@ -387,10 +401,7 @@ export default function Header({ title = 'Dashboard', onNavigate, profile }) {
       <SignOutModal
         isOpen={isSignOutOpen}
         onClose={() => setIsSignOutOpen(false)}
-        onConfirm={() => {
-          clearSession();
-          window.location.replace('/login');
-        }}
+        onConfirm={confirmSignOut}
       />
     </header>
   );

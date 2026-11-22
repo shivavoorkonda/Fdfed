@@ -11,7 +11,6 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.cn-alumni .alumni-portal-body,
 .cn-alumni .alumni-app-container {
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -1289,10 +1288,8 @@
   color: #9ca3af;
 }
 
-/* ==================== DIRECTORY, EVENTS, MENTORSHIP ==================== */
-.cn-alumni .directory-container,
-.cn-alumni .events-container,
-.cn-alumni .mentorship-container {
+/* ==================== DIRECTORY ==================== */
+.cn-alumni .directory-container {
   padding: 24px 32px 32px;
   display: flex;
   flex-direction: column;
@@ -1377,23 +1374,6 @@
 .cn-alumni .directory-filter-select option {
   color: #1e293b;
   background: #fff;
-}
-
-.cn-alumni .btn-search {
-  background: #e76a00;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 9px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: auto;
-  transition: background 0.2s;
-}
-
-.cn-alumni .btn-search:hover {
-  background: #c65400;
 }
 
 .cn-alumni .btn-clear {
@@ -1526,318 +1506,6 @@
 
 .cn-alumni .connect-btn:hover {
   background: #fff7ed;
-}
-
-/* Events */
-.cn-alumni .events-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.cn-alumni .event-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 22px 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-}
-
-.cn-alumni .event-date-block {
-  min-width: 68px;
-  text-align: center;
-  border-radius: 10px;
-  padding: 12px 8px;
-  flex-shrink: 0;
-}
-
-.cn-alumni .type-networking { background: #eff6ff; color: #1d4ed8; }
-.cn-alumni .type-workshop { background: #fef3c7; color: #92400e; }
-.cn-alumni .type-reunion { background: #fdf2f8; color: #9d174d; }
-.cn-alumni .type-webinar { background: #f0fdf4; color: #166534; }
-
-.cn-alumni .eday {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.cn-alumni .emon {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
-}
-
-.cn-alumni .event-info {
-  flex: 1;
-}
-
-.cn-alumni .event-title {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1e293b;
-  margin-bottom: 4px;
-}
-
-.cn-alumni .event-host {
-  font-size: 13px;
-  color: #e76a00;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.cn-alumni .event-desc {
-  font-size: 13px;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.cn-alumni .event-meta {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.cn-alumni .meta-chip {
-  font-size: 12px;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.cn-alumni .type-chip-ev {
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.cn-alumni .reg-btn {
-  background: #e76a00;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.cn-alumni .reg-btn:hover {
-  background: #c65400;
-}
-
-.cn-alumni .reg-btn.registered {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  cursor: default;
-}
-
-/* Mentorship */
-.cn-alumni .mentorship-tabs-bar {
-  display: flex;
-  gap: 0;
-  border-bottom: 2px solid #e2e8f0;
-  margin-bottom: 16px;
-}
-
-.cn-alumni .mentor-tab {
-  padding: 10px 22px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #94a3b8;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.15s;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-}
-
-.cn-alumni .mentor-tab.active {
-  color: #e76a00;
-  border-bottom-color: #e76a00;
-}
-
-.cn-alumni .req-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.cn-alumni .req-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px 22px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.cn-alumni .req-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.cn-alumni .req-name {
-  font-weight: 700;
-  font-size: 15px;
-  color: #1e293b;
-}
-
-.cn-alumni .req-topic {
-  font-size: 13px;
-  color: #e76a00;
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-.cn-alumni .req-msg {
-  font-size: 13px;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.cn-alumni .req-date {
-  font-size: 11px;
-  color: #94a3b8;
-}
-
-.cn-alumni .status-pill {
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.cn-alumni .s-pending { background: #fef3c7; color: #92400e; }
-.cn-alumni .s-accepted { background: #dcfce7; color: #166534; }
-.cn-alumni .s-rejected { background: #fee2e2; color: #dc2626; }
-
-.cn-alumni .req-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.cn-alumni .btn-accept-pill {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 6px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.cn-alumni .btn-reject-pill {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.cn-alumni .send-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  max-width: 600px;
-}
-
-.cn-alumni .send-card h2 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 16px;
-}
-
-.cn-alumni .form-group-custom {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.cn-alumni .form-group-custom label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.cn-alumni .form-group-custom input,
-.cn-alumni .form-group-custom textarea {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: #1e293b;
-  background: #f8fafc;
-  outline: none;
-  font-family: inherit;
-}
-
-.cn-alumni .form-group-custom input:focus,
-.cn-alumni .form-group-custom textarea:focus {
-  border-color: #e76a00;
-  background: #fff;
-}
-
-.cn-alumni .form-group-custom textarea {
-  min-height: 90px;
-  resize: vertical;
-}
-
-.cn-alumni .submit-btn-custom {
-  background: #e76a00;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 11px 24px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  width: 100%;
-  transition: background 0.2s;
-}
-
-.cn-alumni .submit-btn-custom:hover {
-  background: #c65400;
-}
-
-.cn-alumni .success-msg-box {
-  background: #dcfce7;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 12px 16px;
-  color: #166534;
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 12px;
 }
 
 /* ==================== MODALS ==================== */
@@ -1986,27 +1654,6 @@
   background: #c65400;
 }
 
-.cn-alumni .resume-print-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f8fafc;
-  color: #475569;
-  font-weight: 500;
-  font-size: 13px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1.5px solid #cbd5e1;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.cn-alumni .resume-print-btn:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-  color: #0f172a;
-}
-
 .cn-alumni .resume-modal-close {
   background: none;
   border: none;
@@ -2137,23 +1784,6 @@
 }
 
 /* Toast */
-.cn-alumni .toast-notification {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #10b981;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-  z-index: 10000;
-  animation: slideInUp 0.3s ease;
-}
 
 @keyframes slideInUp {
   from { transform: translateY(50px); opacity: 0; }
@@ -2213,9 +1843,7 @@
   .cn-alumni .dash-content,
 .cn-alumni .cards,
 .cn-alumni .profile-content,
-.cn-alumni .directory-container,
-.cn-alumni .events-container,
-.cn-alumni .mentorship-container {
+.cn-alumni .directory-container {
     padding: 16px;
   }
 }

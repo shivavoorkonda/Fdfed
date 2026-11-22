@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useViewState } from '../../store/useViewState.js';
+import { useCallback, useEffect } from "react";
 import StudentCsvImport from "./AccountCsvImport.jsx";
 import { confirmDialog, infoDialog } from "./AppDialog.jsx";
 import api, { errorMessage } from "../../services/api.js";
@@ -50,10 +51,15 @@ export default function AccountDirectory({
   showTabs = true,
   onChanged,
 }) {
-  const [users, setUsers] = useState([]);
-  const [policy, setPolicy] = useState(null);
-  const [loadError, setLoadError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [
+    { users, policy, loadError, loading },
+    { setUsers, setPolicy, setLoadError, setLoading },
+  ] = useViewState('workspace', 'AccountDirectory', () => ({
+    users: [],
+    policy: null,
+    loadError: "",
+    loading: false,
+  }));
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -75,17 +81,22 @@ export default function AccountDirectory({
     window.addEventListener("focus", refresh);
     return () => window.removeEventListener("focus", refresh);
   }, [refresh]);
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [search, setSearch] = useState("");
-  const [branch, setBranch] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
-  const [csvOpen, setCsvOpen] = useState(false);
-  const [form, setForm] = useState(emptyForm);
-  const [saving, setSaving] = useState(false);
-  const [removingId, setRemovingId] = useState(null);
-  const [formError, setFormError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [
+    { activeTab, search, branch, addOpen, csvOpen, form, saving, removingId, formError, fieldErrors, submitted },
+    { setActiveTab, setSearch, setBranch, setAddOpen, setCsvOpen, setForm, setSaving, setRemovingId, setFormError, setFieldErrors, setSubmitted },
+  ] = useViewState('workspace', 'AccountDirectory/activeTab', () => ({
+    activeTab: initialTab,
+    search: "",
+    branch: "",
+    addOpen: false,
+    csvOpen: false,
+    form: emptyForm,
+    saving: false,
+    removingId: null,
+    formError: "",
+    fieldErrors: {},
+    submitted: false,
+  }));
   const setNotice = (message) => infoDialog(message);
   const role = activeTab === "candidates" ? "candidate" : "alumni";
   const matching = filterOversightUsers(users, role, search, branch);

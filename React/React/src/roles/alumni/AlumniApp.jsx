@@ -1,6 +1,8 @@
+import { useViewState } from '../../store/useViewState.js';
 import { infoDialog } from '../../shared/components/AppDialog.jsx';
-import { useEffect, useState } from 'react';
-import api, { clearSession, errorMessage, readSession } from '../../services/api.js';
+import { useEffect } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
+import api, { errorMessage } from '../../services/api.js';
 import Sidebar from './components/Sidebar';
 import AlumniNotifications from './components/AlumniNotifications';
 import SignOutModal from './components/SignOutModal';
@@ -8,7 +10,11 @@ import AlumniDashboard from './pages/AlumniDashboard';
 import AlumniDirectory from './pages/AlumniDirectory';
 import AlumniProfile from './pages/AlumniProfile';
 import ReferralRequests from './pages/ReferralRequests';
-import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
+import { savePage } from '../../shared/utils/navigationState.js';
+import { useLogout, useUpdateSession } from '../../shared/context/AuthContext.jsx';
+import { ALUMNI_PAGE_KEY, alumniActions, initialsOf, selectAlumni } from '../../store/alumni/alumniSlice.js';
+import { selectSession } from '../../store/sessionSlice.js';
+import useWorkspaceDispatch from '../../store/useWorkspaceDispatch.js';
 import './styles/Alumni.css';
 
 const PAGES = {
@@ -17,9 +23,6 @@ const PAGES = {
   profile: AlumniProfile,
   referrals: ReferralRequests,
 };
-const ALUMNI_PAGE_KEY = 'cn_active_alumni_page';
-
-const initialsOf = (name = '') => name.split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
 const toReferral = (r) => {
   const raw = String(r.status || 'pending').toLowerCase();
@@ -43,44 +46,30 @@ const toReferral = (r) => {
   };
 };
 
-const emptyProfile = (session) => ({
-  initials: initialsOf(session?.name),
-  name: session?.name || '',
-  email: session?.email || '',
-  company: '',
-  batch: '',
-  role: 'Alumni',
-  totalReferrals: 0,
-  approved: 0,
-});
-
 export default function AlumniApp() {
-  const session = readSession();
-  const [activePage, setActivePage] = useState(() => readSavedPage(ALUMNI_PAGE_KEY, 'dashboard', Object.keys(PAGES)));
-  const [pageProps, setPageProps] = useState({});
-  const [alumniData, setAlumniData] = useState(() => emptyProfile(session));
-  const [referrals, setReferrals] = useState([]);
-  const [loadError, setLoadError] = useState('');
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
-
-  // ---- Lifted profile state (persists across page navigation) ----
-  const [personalInfo, setPersonalInfo] = useState({
-    name: '', email: '', company: '', batch: '', role: '', location: '', linkedin: '', github: '', portfolio: '',
-  });
-  const [skillsList, setSkillsList] = useState([]);
+  const session = useSelector(selectSession);
+  const dispatch = useWorkspaceDispatch();
+  const confirmSignOut = useLogout();
+  const updateSession = useUpdateSession();
+  const workspace = useSelector(selectAlumni, shallowEqual);
+  const { pageProps, alumniData, referrals, loadError, personalInfo, skillsList } = workspace;
+  const activePage = workspace.activePage;
+  const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('alumni', 'AlumniApp', () => ({
+    isSignOutOpen: false,
+  }));
 
   // Referral requests come straight from the server (the candidate's request, our reply) — no local copies.
   const loadReferrals = async () => {
     const { data } = await api.get('/referrals');
     const final = data.map(toReferral);
-    setReferrals(final);
+    dispatch(alumniActions.referralsLoaded(final));
     return final;
   };
 
   useEffect(() => {
     Promise.all([api.get(`/users/${session.id}`), loadReferrals()])
       .then(([{ data: user }, refs]) => {
-        setAlumniData({
+        const alumniData = {
           initials: user?.avatar || initialsOf(user?.name),
           name: user?.name || '',
           email: user?.email || '',
@@ -89,8 +78,8 @@ export default function AlumniApp() {
           role: 'Alumni',
           totalReferrals: refs.length,
           approved: refs.filter((r) => String(r.status).toLowerCase() === 'approved').length,
-        });
-        setPersonalInfo({
+        };
+        const personalInfo = {
           name: user?.name || '',
           email: user?.email || '',
           company: user?.company || '',
@@ -100,14 +89,14 @@ export default function AlumniApp() {
           linkedin: user?.socialLinks?.linkedin || '',
           github: user?.socialLinks?.github || '',
           portfolio: user?.socialLinks?.portfolio || '',
-        });
-        setSkillsList(user?.skills || []);
+        };
+        dispatch(alumniActions.profileLoaded({ alumniData, personalInfo, skillsList: user?.skills || [] }));
       })
-      .then(() => setLoadError(''))
-      .catch((error) => setLoadError(errorMessage(error, 'Could not load your alumni workspace from the server.')));
+      .then(() => dispatch(alumniActions.loadErrorChanged('')))
+      .catch((error) => dispatch(alumniActions.loadErrorChanged(errorMessage(error, 'Could not load your alumni workspace from the server.'))));
     // Pick up new requests while the alumnus has the portal open.
     const timer = setInterval(() => {
-      if (!document.hidden) loadReferrals().then(() => setLoadError('')).catch((error) => setLoadError(errorMessage(error, 'Could not refresh referral requests.')));
+      if (!document.hidden) loadReferrals().then(() => dispatch(alumniActions.loadErrorChanged(''))).catch((error) => dispatch(alumniActions.loadErrorChanged(errorMessage(error, 'Could not refresh referral requests.'))));
     }, 20000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,20 +112,15 @@ export default function AlumniApp() {
         location: info.location || undefined,
         socialLinks: { linkedin: info.linkedin, github: info.github, portfolio: info.portfolio },
       });
-      setPersonalInfo(info);
-      setAlumniData((prev) => ({
-        ...prev,
-        name: info.name || prev.name,
-        initials: initialsOf(info.name || prev.name),
-        company: info.company || prev.company,
-      }));
+      if (!dispatch(alumniActions.personalInfoSaved(info))) return;
       // Keep the session copy in sync so other open tabs immediately reflect
       // profile changes as well.
-      localStorage.setItem('loggedInUser', JSON.stringify({
+      const nextSession = {
         ...session,
         name: info.name || session?.name,
         company: info.company || session?.company,
-      }));
+      };
+      updateSession(nextSession);
     } catch (error) {
       infoDialog(errorMessage(error, 'Could not save your profile.'));
     }
@@ -144,7 +128,7 @@ export default function AlumniApp() {
 
   const handleSetSkills = async (nextSkills) => {
     const value = typeof nextSkills === 'function' ? nextSkills(skillsList) : nextSkills;
-    setSkillsList(value);
+    dispatch(alumniActions.skillsChanged(value));
     try {
       await api.put(`/users/${session.id}`, { skills: value });
     } catch (error) {
@@ -160,7 +144,9 @@ export default function AlumniApp() {
         alumniResponse: note || undefined,
       });
       const fresh = await loadReferrals();
-      setAlumniData((prev) => ({ ...prev, totalReferrals: fresh.length, approved: fresh.filter((r) => r.status === 'approved').length }));
+      dispatch(alumniActions.referralTotalsChanged({
+        total: fresh.length, approved: fresh.filter((r) => r.status === 'approved').length,
+      }));
     } catch (error) {
       infoDialog(errorMessage(error, 'Could not save your response. Please try again.'));
     }
@@ -171,8 +157,7 @@ export default function AlumniApp() {
     if (typeof page === 'string') {
       const nextPage = Object.hasOwn(PAGES, page) ? page : 'dashboard';
       savePage(ALUMNI_PAGE_KEY, nextPage);
-      setActivePage(nextPage);
-      setPageProps(props || {});
+      dispatch(alumniActions.pageChanged({ page: nextPage, props: props || {} }));
     }
   };
 
@@ -204,10 +189,7 @@ export default function AlumniApp() {
       <SignOutModal
         isOpen={isSignOutOpen}
         onClose={() => setIsSignOutOpen(false)}
-        onConfirm={() => {
-          clearSession();
-          window.location.replace('/login');
-        }}
+        onConfirm={confirmSignOut}
       />
     </div>
     </div>

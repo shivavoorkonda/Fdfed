@@ -1,13 +1,9 @@
 import { LogOut } from 'lucide-react';
-import { clearSession } from '../../../services/api.js';
+import { useLogout } from '../../../shared/context/AuthContext.jsx';
 
 export default function SignOutModal({ isOpen, onClose }) {
+    const confirmSignOut = useLogout();
     if (!isOpen) return null;
-
-    const confirmSignOut = () => {
-        clearSession();
-        window.location.replace('/login');
-    };
 
     return (
         <div className="candidate-signout-overlay" onClick={(event) => event.target === event.currentTarget && onClose()}>

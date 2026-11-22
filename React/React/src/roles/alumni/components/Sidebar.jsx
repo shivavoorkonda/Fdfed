@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function Sidebar({ activePage, onNavigate, onOpenSignOut, alumni }) {
   const currentAlumni = alumni || {};

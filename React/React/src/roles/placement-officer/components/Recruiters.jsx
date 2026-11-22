@@ -1,12 +1,12 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Sidebar from './Sidebar';
 import RecruiterOpportunitiesModal from '../../../shared/components/RecruiterOpportunitiesModal.jsx';
 import Header from './Header';
 import './styles/p4.css';
 import api, { errorMessage } from '../../../services/api.js';
 import { useOfficerData } from '../services/officerApi';
-
 
 export default function Recruiters({ onNavigate, activePage = 'p4' }) {
   /* ── Recruiters come from the API; approvals write to it and reload ── */
@@ -24,15 +24,24 @@ export default function Recruiters({ onNavigate, activePage = 'p4' }) {
     }
   };
 
-  const [selectedRecruiter, setSelectedRecruiter] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [openProfileIdx, setOpenProfileIdx] = useState(null);
-  const [openVerifyIdx, setOpenVerifyIdx] = useState(null);
-  const [openDeclineIdx, setOpenDeclineIdx] = useState(null);
-  const [declineRemarks, setDeclineRemarks] = useState('');
-  const [declineError, setDeclineError] = useState(false);
-  const [credentials, setCredentials] = useState(null);   // shown once after a recruiter is verified
-  const [copied, setCopied] = useState(false);
+  const [
+    { selectedRecruiterId, searchQuery, openProfileIdx, openVerifyIdx, openDeclineIdx, declineRemarks, declineError, credentials },
+    { setSelectedRecruiterId, setSearchQuery, setOpenProfileIdx, setOpenVerifyIdx, setOpenDeclineIdx, setDeclineRemarks, setDeclineError, setCredentials },
+  ] = useViewState('placementOfficer', 'Recruiters', () => ({
+    selectedRecruiterId: null,
+    searchQuery: '',
+    openProfileIdx: null,
+    openVerifyIdx: null,
+    openDeclineIdx: null,
+    declineRemarks: '',
+    declineError: false,
+    credentials: null,
+  }));   // shown once after a recruiter is verified
+  const [{ copied }, { setCopied }] = useViewState('placementOfficer', 'Recruiters/copied', () => ({
+    copied: false,
+  }));
+
+  const selectedRecruiter = recruiters.find((recruiter) => recruiter.id === selectedRecruiterId);
 
   const recStats = {
     total: recruiters.length,
@@ -113,7 +122,7 @@ export default function Recruiters({ onNavigate, activePage = 'p4' }) {
       <Sidebar activePage={activePage} onNavigate={onNavigate} />
 
       <Header title="Recruiter Management" onNavigate={onNavigate} />
-      {selectedRecruiter && <RecruiterOpportunitiesModal key={selectedRecruiter.id} recruiter={selectedRecruiter} onClose={() => setSelectedRecruiter(null)} />}
+      {selectedRecruiter && <RecruiterOpportunitiesModal key={selectedRecruiter.id} recruiter={selectedRecruiter} onClose={() => setSelectedRecruiterId(null)} />}
 
       <main className="main-content" id="mainContent">
         {loadError && <p role="alert" style={{ color: '#b91c1c', marginBottom: 12 }}>{loadError}</p>}
@@ -217,7 +226,7 @@ export default function Recruiters({ onNavigate, activePage = 'p4' }) {
                   <React.Fragment key={r.id}>
                   <React.Fragment key={realIdx}>
                     {/* Main Row */}
-                    <tr className="rec-row" data-i={realIdx} tabIndex={0} aria-label={`View opportunities submitted by ${r.name}`} style={{cursor:'pointer'}} onClick={() => setSelectedRecruiter(r)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); setSelectedRecruiter(r); } }}>
+                    <tr className="rec-row" data-i={realIdx} tabIndex={0} aria-label={`View opportunities submitted by ${r.name}`} style={{cursor:'pointer'}} onClick={() => setSelectedRecruiterId(r.id)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); setSelectedRecruiterId(r.id); } }}>
                       <td>
                         <div className="rec-name">
                           <div className="rec-avatar">{r.name[0]}</div>
@@ -226,7 +235,7 @@ export default function Recruiters({ onNavigate, activePage = 'p4' }) {
                       </td>
                       <td>{r.company}</td>
                       <td>{r.role}</td>
-                      <td><button type="button" className="btn-profile" onClick={(event) => { event.stopPropagation(); setSelectedRecruiter(r); }}>View Opportunities ({r.opps})</button></td>
+                      <td><button type="button" className="btn-profile" onClick={(event) => { event.stopPropagation(); setSelectedRecruiterId(r.id); }}>View Opportunities ({r.opps})</button></td>
                       <td>
                         <span className={`badge-status badge-${r.status}`}>
                           {r.status.charAt(0).toUpperCase() + r.status.slice(1)}

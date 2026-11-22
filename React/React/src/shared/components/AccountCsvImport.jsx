@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useViewState } from '../../store/useViewState.js';
 import api, { errorMessage } from "../../services/api.js";
 
 const button = {
@@ -38,11 +38,16 @@ export default function StudentCsvImport({
         ["cgpa", "CGPA"],
         ["backlogs", "Backlogs"],
       ];
-  const [csv, setCsv] = useState("");
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [filename, setFilename] = useState("");
+  const [
+    { csv, result, error, busy, filename },
+    { setCsv, setResult, setError, setBusy, setFilename },
+  ] = useViewState('workspace', 'StudentCsvImport', () => ({
+    csv: "",
+    result: null,
+    error: "",
+    busy: false,
+    filename: "",
+  }));
 
   const downloadTemplate = () => {
     const text = isAlumni

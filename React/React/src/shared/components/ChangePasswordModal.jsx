@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useViewState } from '../../store/useViewState.js';
+import { useEffect, useRef } from 'react';
 import api, { errorMessage } from '../../services/api.js';
 
 // Shared "Change Password" dialog used by the alumni and placement-officer profile pages.
@@ -11,37 +12,36 @@ const MIN_LENGTH = 8; // mirrors the backend password policy
 
 const EMPTY = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
-export default function ChangePasswordModal({ isOpen, onClose, userId, accentColor = '#7c3aed' }) {
-  const [form, setForm] = useState(EMPTY);
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [saving, setSaving] = useState(false);
+export default function ChangePasswordModal({ isOpen, ...props }) {
+  return isOpen ? <ChangePasswordForm {...props} /> : null;
+}
+
+function ChangePasswordForm({ onClose, userId, accentColor = '#7c3aed' }) {
+  const [
+    { form, showPasswords, error, success, saving },
+    { setForm, setShowPasswords, setError, setSuccess, setSaving },
+  ] = useViewState('workspace', 'ChangePasswordModal', () => ({
+    form: EMPTY,
+    showPasswords: false,
+    error: '',
+    success: false,
+    saving: false,
+  }));
   const firstFieldRef = useRef(null);
   const closeTimer = useRef(null);
 
-  // Start from a clean form every time the dialog opens.
   useEffect(() => {
-    if (!isOpen) return undefined;
-    setForm(EMPTY);
-    setShowPasswords(false);
-    setError('');
-    setSuccess(false);
-    setSaving(false);
     const focusTimer = window.setTimeout(() => firstFieldRef.current?.focus(), 50);
     return () => window.clearTimeout(focusTimer);
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
     const onKeyDown = (event) => { if (event.key === 'Escape' && !saving) onClose(); };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, saving, onClose]);
-
-  if (!isOpen) return null;
+  }, [saving, onClose]);
 
   const setField = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
@@ -71,7 +71,7 @@ export default function ChangePasswordModal({ isOpen, onClose, userId, accentCol
       });
       setSuccess(true);
       setForm(EMPTY);
-      closeTimer.current = window.setTimeout(onClose, 1600);
+      if (firstFieldRef.current) closeTimer.current = window.setTimeout(onClose, 1600);
     } catch (err) {
       setError(
         err?.response?.status === 401

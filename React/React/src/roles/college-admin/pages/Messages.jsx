@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import { Mail, Megaphone, Inbox } from 'lucide-react';
 import api, { errorMessage } from '../../../services/api.js';
 
@@ -9,8 +10,10 @@ const fmt = (iso) => {
 
 /** Messages sent to this college by the platform's super admin. */
 export default function Messages({ onSeen }) {
-  const [messages, setMessages] = useState(null);
-  const [error, setError] = useState('');
+  const [{ messages, error }, { setMessages, setError }] = useViewState('collegeAdmin', 'Messages', () => ({
+    messages: null,
+    error: '',
+  }));
 
   useEffect(() => {
     api.get('/super-admin/inbox')

@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
 function Navbar() {
   const { theme, toggleTheme } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
+  const [{ scrolled }, { setScrolled }] = useViewState('publicPages', 'Navbar', () => ({
+    scrolled: false,
+  }));
   const navigate = useNavigate();
 
   useEffect(() => {

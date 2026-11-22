@@ -1,5 +1,4 @@
-import React from 'react';
-import { BarChart3, TrendingUp, Users, Award, CheckCircle } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
 export default function HiringReport({ applications, opportunities }) {
   // Compute analytics

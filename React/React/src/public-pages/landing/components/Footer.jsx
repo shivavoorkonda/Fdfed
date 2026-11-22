@@ -1,9 +1,11 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import { useState } from "react";
 
 function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [{ email, subscribed }, { setEmail, setSubscribed }] = useViewState('publicPages', 'Footer', () => ({
+    email: "",
+    subscribed: false,
+  }));
 
   const handleSubscribe = (e) => {
     e.preventDefault();

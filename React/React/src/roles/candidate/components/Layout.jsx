@@ -1,6 +1,7 @@
+import { useViewState } from '../../../store/useViewState.js';
 import '../styles/ui.css';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { memo, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useCallback, useLayoutEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import SignOutModal from './SignOutModal.jsx';
 import { useStore } from '../context/StoreContext.jsx';
@@ -65,7 +66,9 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const user = store.currentUser;
-    const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+    const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('candidate', 'Layout', () => ({
+      isSignOutOpen: false,
+    }));
 
     const activeItem = [...NAV_ITEMS, PROFILE_TITLE].find((item) =>
         item.to === '/candidate' ? location.pathname === '/candidate' : location.pathname.startsWith(item.to)

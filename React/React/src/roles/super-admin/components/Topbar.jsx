@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useRef } from 'react';
 import { LogOut, User } from 'lucide-react';
 
 export default function Topbar({ title, userName, avatarInitials, onProfileClick, onSignOutClick }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [{ dropdownOpen }, { setDropdownOpen }] = useViewState('superAdmin', 'Topbar', () => ({
+    dropdownOpen: false,
+  }));
   const dropdownRef = useRef(null);
 
   useEffect(() => {

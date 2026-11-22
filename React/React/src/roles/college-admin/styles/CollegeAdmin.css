@@ -528,49 +528,6 @@
 }
 
 /* ================= QUICK ACTIONS ================= */
-.cn-college-admin .quick-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.cn-college-admin .quick-action-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: all .15s;
-  text-align: left;
-  width: 100%;
-}
-
-.cn-college-admin .quick-action-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.cn-college-admin .quick-action-border-sky    { border-left: 4px solid #0ea5e9; }
-.cn-college-admin .quick-action-border-green  { border-left: 4px solid #22c55e; }
-.cn-college-admin .quick-action-border-amber  { border-left: 4px solid #f59e0b; }
-
-.cn-college-admin .quick-action-icon {
-  margin-bottom: 8px;
-}
-
-.cn-college-admin .quick-action-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.cn-college-admin .quick-action-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 3px;
-}
 
 /* ================= EMPTY STATE ================= */
 .cn-college-admin .empty-state {
@@ -616,9 +573,6 @@
 }
 
 /* ================= CGPA COLORS ================= */
-.cn-college-admin .cgpa-high   { color: #16a34a; font-weight: 700; }
-.cn-college-admin .cgpa-mid    { color: #d97706; font-weight: 700; }
-.cn-college-admin .cgpa-low    { color: #ef4444; font-weight: 700; }
 
 /* ================= SIDEBAR ROLE BADGE ================= */
 .cn-college-admin .sidebar-role-badge {
@@ -627,12 +581,6 @@
   font-weight: 600;
   color: #7dd3fc;
   letter-spacing: 0.3px;
-}
-.cn-college-admin .sidebar-help-text {
-  font-size: 11px;
-  color: #4e88a3;
-  line-height: 1.5;
-  padding: 0 4px 12px;
 }
 
 /* ================= WELCOME BANNER META ================= */
@@ -774,12 +722,6 @@
   background: var(--card-bg); border-radius: var(--radius-lg);
   border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 20px;
 }
-.cn-college-admin .monthly-bars         { display: flex; align-items: flex-end; gap: 10px; height: 140px; }
-.cn-college-admin .monthly-bar-col      { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
-.cn-college-admin .monthly-bar-val      { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-.cn-college-admin .monthly-bar-track    { flex: 1; width: 100%; background: #f1f5f9; border-radius: 6px 6px 0 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
-.cn-college-admin .monthly-bar-fill     { background: linear-gradient(180deg, #0ea5e9, #0284c7); border-radius: 6px 6px 0 0; width: 100%; transition: height 0.5s ease; }
-.cn-college-admin .monthly-bar-label    { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
 /* ================= OFFICERS ENHANCEMENTS ================= */
 .cn-college-admin .officers-summary-bar { display: flex; gap: 10px; margin-bottom: 16px; }

@@ -869,49 +869,6 @@
   align-items: flex-start;
 }
 
-.cn-recruiter .opp-card-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.cn-recruiter .opp-card-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.cn-recruiter .meta-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cn-recruiter .opp-details-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  background: #F9FAFB;
-  padding: 14px;
-  border-radius: var(--radius-md);
-}
-
-.cn-recruiter .detail-col h5 {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
-.cn-recruiter .detail-col p {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
 .cn-recruiter .opp-actions-row {
   display: flex;
   gap: 10px;
@@ -1149,57 +1106,8 @@
 }
 
 /* Status selection buttons inside modal */
-.cn-recruiter .status-chips-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 20px;
-}
-
-.cn-recruiter .status-select-chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  background: #F9FAFB;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #4B5563;
-  transition: all 0.15s;
-}
-
-.cn-recruiter .status-select-chip.active {
-  background: #0F8F63;
-  color: white;
-  border-color: #0F8F63;
-}
 
 /* Round rows in modal */
-.cn-recruiter .round-row-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: #F9FAFB;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  margin-bottom: 8px;
-}
-
-.cn-recruiter .round-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-.cn-recruiter .round-select {
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  font-size: 12px;
-  font-weight: 600;
-  background: white;
-}
 
 /* ================= ASSESSMENTS VIEW ================= */
 .cn-recruiter .assessments-header-banner {
@@ -1444,23 +1352,6 @@
 }
 
 /* Toast alert */
-.cn-recruiter .toast-success {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #065F46;
-  color: white;
-  padding: 12px 20px;
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 9999;
-  animation: slideUp 0.25s ease-out;
-}
 
 @keyframes slideUp {
   from {

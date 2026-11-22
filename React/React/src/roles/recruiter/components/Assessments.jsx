@@ -1,10 +1,12 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { confirmDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState } from 'react';
 import { Calendar, Video, Users, ExternalLink, Plus, Trash2, Mail } from 'lucide-react';
 import ScheduleModal from './ScheduleModal';
 
 export default function Assessments({ assessments, opportunities = [], applications = [], onAddAssessment, onDeleteAssessment, preselectApplicationId, onModalClosed }) {
-  const [showScheduleModal, setShowScheduleModal] = useState(Boolean(preselectApplicationId));
+  const [{ showScheduleModal }, { setShowScheduleModal }] = useViewState('recruiter', 'Assessments', () => ({
+    showScheduleModal: Boolean(preselectApplicationId),
+  }));
 
   return (
     <div>

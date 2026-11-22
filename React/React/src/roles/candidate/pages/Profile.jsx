@@ -1,7 +1,9 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import { useEffect, useRef, useState } from 'react';
-import { Camera, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { candidateActions } from '../../../store/candidate/candidateSlice.js';
 import { useStore } from '../context/StoreContext.jsx';
 import { useUI } from '../context/UIContext.jsx';
 import '../styles/profile.css';
@@ -30,24 +32,38 @@ function fileToBase64(file) {
 }
 
 export default function Profile() {
-    const { store, updateStore } = useStore();
+    const { store, dispatchCandidate } = useStore();
     const { showSuccess } = useUI();
     const user = store.currentUser;
     const data = store.profileResumeData;
 
     // ---- Modal state ----
-    const [modal, setModal] = useState(null); // 'intro' | 'about' | 'skills' | 'languages' | 'codingProfiles' | 'record' | null
-    const [recordType, setRecordType] = useState(null);
-    const [imageOptionsTarget, setImageOptionsTarget] = useState(null); // 'banner' | 'avatar' | null
-    const [confirmDelete, setConfirmDelete] = useState(null); // { type, index } | null
+    const [{ modal }, { setModal }] = useViewState('candidate', 'Profile', () => ({
+      modal: null,
+    })); // 'intro' | 'about' | 'skills' | 'languages' | 'codingProfiles' | 'record' | null
+    const [
+      { recordType, imageOptionsTarget },
+      { setRecordType, setImageOptionsTarget },
+    ] = useViewState('candidate', 'Profile/recordType', () => ({
+      recordType: null,
+      imageOptionsTarget: null,
+    })); // 'banner' | 'avatar' | null
+    const [{ confirmDelete }, { setConfirmDelete }] = useViewState('candidate', 'Profile/confirmDelete', () => ({
+      confirmDelete: null,
+    })); // { type, index } | null
 
     // ---- Form field state ----
-    const [introForm, setIntroForm] = useState({ name: '', email: '', headline: '', location: '', university: '', batch: '', phone: '', github: '', linkedin: '', portfolio: '' });
-    const [aboutText, setAboutText] = useState('');
-    const [skillInput, setSkillInput] = useState('');
-    const [langForm, setLangForm] = useState({ name: '', level: 'Native' });
-    const [codingForm, setCodingForm] = useState({ platform: '', url: '', handle: '' });
-    const [recordForm, setRecordForm] = useState({ title: '', subtitle: '', start: '', end: '', link: '', desc: '', imageBase64: '' });
+    const [
+      { introForm, aboutText, skillInput, langForm, codingForm, recordForm },
+      { setIntroForm, setAboutText, setSkillInput, setLangForm, setCodingForm, setRecordForm },
+    ] = useViewState('candidate', 'Profile/introForm', () => ({
+      introForm: { name: '', email: '', headline: '', location: '', university: '', batch: '', phone: '', github: '', linkedin: '', portfolio: '' },
+      aboutText: '',
+      skillInput: '',
+      langForm: { name: '', level: 'Native' },
+      codingForm: { platform: '', url: '', handle: '' },
+      recordForm: { title: '', subtitle: '', start: '', end: '', link: '', desc: '', imageBase64: '' },
+    }));
 
     const storageInputRef = useRef(null);
     const cameraInputRef = useRef(null);
@@ -130,31 +146,14 @@ export default function Profile() {
     function saveIntro(e) {
         e.preventDefault();
         if (phoneError(introForm.phone)) { showSuccess('Check phone number', phoneError(introForm.phone)); return; }
-        updateStore((s) => {
-            s.currentUser.name = introForm.name;
-            s.currentUser.email = introForm.email;
-            s.currentUser.headline = introForm.headline;
-            s.currentUser.location = introForm.location;
-            s.currentUser.university = introForm.university;
-            s.currentUser.batch = introForm.batch;
-            s.currentUser.phone = introForm.phone;
-            s.currentUser.socialLinks = {
-                github: introForm.github,
-                linkedin: introForm.linkedin,
-                portfolio: introForm.portfolio,
-            };
-            const parts = s.currentUser.name.split(' ');
-            s.currentUser.avatar = parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
-        });
+        dispatchCandidate(candidateActions.introSaved(introForm));
         closeModal();
         showSuccess('Profile Updated', 'Your intro details have been saved.');
     }
 
     function saveAbout(e) {
         e.preventDefault();
-        updateStore((s) => {
-            s.currentUser.about = aboutText;
-        });
+        dispatchCandidate(candidateActions.aboutSaved(aboutText));
         closeModal();
     }
 
@@ -162,28 +161,23 @@ export default function Profile() {
         e.preventDefault();
         const newSkill = skillInput.trim();
         if (!newSkill) return;
-        updateStore((s) => {
-            if (!s.profileResumeData.skills) s.profileResumeData.skills = [];
-            s.profileResumeData.skills.push(newSkill);
-        });
+        dispatchCandidate(candidateActions.resumeRecordAdded({ section: 'skills', record: newSkill }));
         closeModal();
     }
 
     function saveLanguage(e) {
         e.preventDefault();
-        updateStore((s) => {
-            if (!s.profileResumeData.languages) s.profileResumeData.languages = [];
-            s.profileResumeData.languages.push({ name: langForm.name, level: langForm.level });
-        });
+        dispatchCandidate(candidateActions.resumeRecordAdded({
+            section: 'languages', record: { name: langForm.name, level: langForm.level },
+        }));
         closeModal();
     }
 
     function saveCoding(e) {
         e.preventDefault();
-        updateStore((s) => {
-            if (!s.profileResumeData.codingProfiles) s.profileResumeData.codingProfiles = [];
-            s.profileResumeData.codingProfiles.push({ platform: codingForm.platform, url: codingForm.url, handle: codingForm.handle });
-        });
+        dispatchCandidate(candidateActions.resumeRecordAdded({
+            section: 'codingProfiles', record: { platform: codingForm.platform, url: codingForm.url, handle: codingForm.handle },
+        }));
         closeModal();
     }
 
@@ -193,20 +187,17 @@ export default function Profile() {
         const endStr = recordForm.end ? formatMonthYear(recordForm.end) : 'Present';
         const durationCombo = startStr ? `${startStr} - ${endStr}` : '';
 
-        updateStore((s) => {
-            if (!s.profileResumeData[recordType]) s.profileResumeData[recordType] = [];
-            let newRecord = {};
-            if (recordType === 'projects') {
-                newRecord = { title: recordForm.title, tags: recordForm.subtitle, github: recordForm.link, description: recordForm.desc };
-            } else if (recordType === 'education') {
-                newRecord = { degree: recordForm.title, institution: recordForm.subtitle, duration: durationCombo, desc: recordForm.desc };
-            } else if (recordType === 'certifications') {
-                newRecord = { title: recordForm.title, issuer: recordForm.subtitle, date: startStr, image: recordForm.imageBase64 };
-            } else {
-                newRecord = { title: recordForm.title, company: recordForm.subtitle, duration: durationCombo, desc: recordForm.desc, image: recordForm.imageBase64 };
-            }
-            s.profileResumeData[recordType].push(newRecord);
-        });
+        let newRecord = {};
+        if (recordType === 'projects') {
+            newRecord = { title: recordForm.title, tags: recordForm.subtitle, github: recordForm.link, description: recordForm.desc };
+        } else if (recordType === 'education') {
+            newRecord = { degree: recordForm.title, institution: recordForm.subtitle, duration: durationCombo, desc: recordForm.desc };
+        } else if (recordType === 'certifications') {
+            newRecord = { title: recordForm.title, issuer: recordForm.subtitle, date: startStr, image: recordForm.imageBase64 };
+        } else {
+            newRecord = { title: recordForm.title, company: recordForm.subtitle, duration: durationCombo, desc: recordForm.desc, image: recordForm.imageBase64 };
+        }
+        dispatchCandidate(candidateActions.resumeRecordAdded({ section: recordType, record: newRecord }));
         closeModal();
         showSuccess('Record Added', 'The new entry has been added to your profile.');
     }
@@ -224,12 +215,7 @@ export default function Profile() {
 
     function executeDelete() {
         if (!confirmDelete) return;
-        updateStore((s) => {
-            if (s.profileResumeData[confirmDelete.type]) {
-                s.profileResumeData[confirmDelete.type].splice(confirmDelete.index, 1);
-            }
-            s.notificationsData.unshift({ title: 'Record Deleted', message: 'Item removed successfully from your profile.', isRead: false });
-        });
+        dispatchCandidate(candidateActions.resumeRecordRemoved(confirmDelete));
         setConfirmDelete(null);
     }
 
@@ -246,35 +232,25 @@ export default function Profile() {
     function triggerImageDelete() {
         const target = imageOptionsTarget;
         setImageOptionsTarget(null);
-        updateStore((s) => {
-            s.currentUser[target] = '';
-            s.notificationsData.unshift({ title: 'Image Deleted', message: 'Media successfully removed from your profile.', isRead: false });
-        });
+        dispatchCandidate(candidateActions.profileImageRemoved(target));
     }
 
     async function handleImageUpload(e, targetType) {
         const file = e.target.files[0];
         if (!file) return;
         const base64 = await fileToBase64(file);
-        updateStore((s) => {
-            if (targetType === 'banner') s.currentUser.bannerImage = base64;
-            if (targetType === 'avatar') s.currentUser.avatarImage = base64;
-        });
+        dispatchCandidate(candidateActions.profileImageUploaded({ target: targetType, image: base64 }));
         e.target.value = '';
     }
 
     function handleDocUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
-        updateStore((s) => {
-            if (!s.profileResumeData.additionalDocs) s.profileResumeData.additionalDocs = [];
-            s.profileResumeData.additionalDocs.push({
-                name: file.name,
-                type: 'Document',
-                size: (file.size / 1024).toFixed(0) + ' KB',
-            });
-            s.notificationsData.unshift({ title: 'Document Uploaded', message: `Successfully uploaded ${file.name}.`, isRead: false });
-        });
+        dispatchCandidate(candidateActions.documentUploaded({
+            name: file.name,
+            type: 'Document',
+            size: (file.size / 1024).toFixed(0) + ' KB',
+        }));
         e.target.value = '';
     }
 

@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 import { X, AlertCircle } from 'lucide-react';
 
 export default function ScheduleModal({ onClose, onAddAssessment, opportunities = [], applications = [], preselectApplicationId }) {
-  const [title, setTitle] = useState('');
   // Who this round is for: one application ("app:12") or everyone who applied to a role ("opp:3")
   const schedulable = applications.filter((a) => ['Shortlisted', 'Interview'].includes(a.status));
   const isPreselectedValid = preselectApplicationId && schedulable.some((a) => a.id === Number(preselectApplicationId));
-  const [jobId, setJobId] = useState(isPreselectedValid ? String(schedulable.find(a => a.id === Number(preselectApplicationId)).opportunityId) : '');
-  const [selectedIds, setSelectedIds] = useState(isPreselectedValid ? [Number(preselectApplicationId)] : []);
-  const [search, setSearch] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [
+    { title, jobId, selectedIds, search, saving, date, time, duration, platform, type, link, errors },
+    { setTitle, setJobId, setSelectedIds, setSearch, setSaving, setDate, setTime, setDuration, setPlatform, setType, setLink, setErrors },
+  ] = useViewState('recruiter', 'ScheduleModal', () => ({
+    title: '',
+    jobId: isPreselectedValid ? String(schedulable.find(a => a.id === Number(preselectApplicationId)).opportunityId) : '',
+    selectedIds: isPreselectedValid ? [Number(preselectApplicationId)] : [],
+    search: '',
+    saving: false,
+    date: '',
+    time: '10:00',
+    duration: '60 min',
+    platform: 'Google Meet',
+    type: 'Technical Interview',
+    link: '',
+    errors: {},
+  }));
   const eligible = schedulable.filter(a => String(a.opportunityId) === jobId);
   const visible = eligible.filter(a => `${a.name} ${a.email} ${a.branch} ${a.role} ${a.jobId || ''}`.toLowerCase().includes(search.toLowerCase()));
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('10:00');
-  const [duration, setDuration] = useState('60 min');
-  const [platform, setPlatform] = useState('Google Meet');
-  const [type, setType] = useState('Technical Interview');
-  const [link, setLink] = useState('');
-
-  // Validation errors
-  const [errors, setErrors] = useState({});
 
   // ── Validators ────────────────────────────────────────────────────────────
 

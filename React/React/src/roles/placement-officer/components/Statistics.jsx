@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -23,10 +24,17 @@ export default function Statistics({ onNavigate, activePage = 'p3' }) {
   const doughnutChartRef = useRef(null);
   const chartInstances = useRef([]);
 
-  const [showFullTime,    setShowFullTime]    = useState(true);
-  const [showInternships, setShowInternships] = useState(true);
-  const [lineChart,       setLineChart]       = useState(null);
-  const [activeTab,       setActiveTab]       = useState('overview');
+  const [
+    { showFullTime, showInternships },
+    { setShowFullTime, setShowInternships },
+  ] = useViewState('placementOfficer', 'Statistics', () => ({
+    showFullTime: true,
+    showInternships: true,
+  }));
+  const lineChart = useRef(null);
+  const [{ activeTab }, { setActiveTab }] = useViewState('placementOfficer', 'Statistics/activeTab', () => ({
+    activeTab: 'overview',
+  }));
 
   const maxTrend = Math.max(1, ...monthlyTrend.map((m) => m.placements));
 
@@ -47,14 +55,15 @@ export default function Statistics({ onNavigate, activePage = 'p3' }) {
   useEffect(() => {
     initCharts();
     return () => {
-      chartInstances.current.forEach((c) => { try { c.destroy(); } catch (e) {} });
+      chartInstances.current.forEach((c) => { try { c.destroy(); } catch {} });
       chartInstances.current = [];
+      lineChart.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, activeTab, data]);
 
   const initCharts = () => {
-    chartInstances.current.forEach((c) => { try { c.destroy(); } catch (e) {} });
+    chartInstances.current.forEach((c) => { try { c.destroy(); } catch {} });
     chartInstances.current = [];
 
     // Line Chart — Monthly Trend
@@ -71,7 +80,7 @@ export default function Statistics({ onNavigate, activePage = 'p3' }) {
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } },
       });
       chartInstances.current.push(chart);
-      setLineChart(chart);
+      lineChart.current = chart;
     }
 
     // Bar Chart — Branch-wise Placement
@@ -105,12 +114,17 @@ export default function Statistics({ onNavigate, activePage = 'p3' }) {
   };
 
   const toggleLine = (type) => {
-    if (!lineChart) return;
+    const chart = lineChart.current;
+    if (!chart) return;
     const idx = type === 'fulltime' ? 0 : 1;
     if (type === 'fulltime') {
-      setShowFullTime((prev) => { lineChart.data.datasets[idx].hidden = prev; lineChart.update(); return !prev; });
+      chart.data.datasets[idx].hidden = showFullTime;
+      chart.update();
+      setShowFullTime(!showFullTime);
     } else {
-      setShowInternships((prev) => { lineChart.data.datasets[idx].hidden = prev; lineChart.update(); return !prev; });
+      chart.data.datasets[idx].hidden = showInternships;
+      chart.update();
+      setShowInternships(!showInternships);
     }
   };
 

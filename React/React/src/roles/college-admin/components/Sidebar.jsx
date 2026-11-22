@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   LayoutDashboard, ShieldCheck, GraduationCap, UsersRound,
   Megaphone, BarChart2, Building2, LogOut, Mail

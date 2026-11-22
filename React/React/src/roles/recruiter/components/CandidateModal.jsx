@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import api from '../../../services/api.js';
 import { confirmDialog } from '../../../shared/components/AppDialog.jsx';
 import { X, FileText, Mail, Phone, Calendar, Eye } from 'lucide-react';
@@ -12,19 +13,28 @@ export default function CandidateModal({
   onUpdateStatus,
   initialShowResumePreview = false,
 }) {
-  const [showResumePreview, setShowResumePreview] = useState(initialShowResumePreview);
-
-  const [resumeBlob, setResumeBlob] = useState('');
-  const [resumeError, setResumeError] = useState('');
+  const [
+    { showResumePreview, resumeBlob, resumeError },
+    { setShowResumePreview, setResumeBlob, setResumeError },
+  ] = useViewState('recruiter', 'CandidateModal', () => ({
+    showResumePreview: initialShowResumePreview,
+    resumeBlob: '',
+    resumeError: '',
+  }));
   useEffect(() => {
     if (!showResumePreview || !candidate?.resumeUrl) return;
     let active = true; let url;
     api.get(`/applications/${candidate.id}/resume`, { responseType: 'blob' }).then(({data}) => { if (active) { url = URL.createObjectURL(data); setResumeBlob(url); } }).catch(() => { if (active) setResumeError('Could not load the resume document.'); });
     return () => { active = false; if (url) URL.revokeObjectURL(url); setResumeBlob(''); setResumeError(''); };
   }, [showResumePreview, candidate?.id, candidate?.resumeUrl]);
-  const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState(candidate?.recruiterFeedback || '');
-  const [rating, setRating] = useState(candidate?.recruiterRating || 5);
+  const [
+    { saving, feedback, rating },
+    { setSaving, setFeedback, setRating },
+  ] = useViewState('recruiter', 'CandidateModal/saving', () => ({
+    saving: false,
+    feedback: candidate?.recruiterFeedback || '',
+    rating: candidate?.recruiterRating || 5,
+  }));
   if (!candidate) return null;
 
   // Derived current status (read-only chip shown to recruiter)

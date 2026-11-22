@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
 
 const faqs = [
   {
@@ -51,8 +51,9 @@ const faqs = [
 ];
 
 function FAQ() {
-  const [activeIndex, setActiveIndex] =
-    useState(null);
+  const [{ activeIndex }, { setActiveIndex }] = useViewState('publicPages', 'FAQ', () => ({
+    activeIndex: null,
+  }));
 
   const toggleFAQ = (index) => {
     setActiveIndex(

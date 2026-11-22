@@ -1,5 +1,5 @@
-import { clearSession } from '../../../services/api.js';
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useLogout } from '../../../shared/context/AuthContext.jsx';
 import { BarChart3, Bell, BriefcaseBusiness, ClipboardList, LayoutDashboard, LogOut, UserCog, UsersRound } from 'lucide-react';
 import SignOutModal from './SignOutModal';
 
@@ -14,7 +14,10 @@ const navItems = [
 ];
 
 export default function Sidebar({ activePage = 'p1', onNavigate }) {
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const confirmSignOut = useLogout();
+  const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('placementOfficer', 'Sidebar', () => ({
+    isSignOutOpen: false,
+  }));
   const handleClick = (item) => {
     if (onNavigate) {
       onNavigate(item.page);
@@ -56,10 +59,7 @@ export default function Sidebar({ activePage = 'p1', onNavigate }) {
       <SignOutModal
         isOpen={isSignOutOpen}
         onClose={() => setIsSignOutOpen(false)}
-        onConfirm={() => {
-          clearSession();
-          window.location.replace('/login');
-        }}
+        onConfirm={confirmSignOut}
       />
     </nav>
   );

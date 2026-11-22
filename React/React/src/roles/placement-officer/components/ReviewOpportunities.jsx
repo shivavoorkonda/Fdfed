@@ -1,5 +1,5 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { infoDialog } from '../../../shared/components/AppDialog.jsx';
-import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './styles/p2.css';
@@ -11,13 +11,18 @@ const REVIEW_STATUSES = ['all', 'pending', 'approved', 'published', 'rejected'];
 export default function ReviewOpportunities({ onNavigate, activePage = 'p2' }) {
   const { data, refresh, ready, error: loadError } = useOfficerData();
   const submissions = data.submissions || [];
-  const [activeStatus, setActiveStatus] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [openCards, setOpenCards] = useState({});
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [rejectTarget, setRejectTarget] = useState(null);
-  const [rejectRemarks, setRejectRemarks] = useState('');
-  const [rejectError, setRejectError] = useState(false);
+  const [
+    { activeStatus, typeFilter, openCards, rejectModalOpen, rejectTarget, rejectRemarks, rejectError },
+    { setActiveStatus, setTypeFilter, setOpenCards, setRejectModalOpen, setRejectTarget, setRejectRemarks, setRejectError },
+  ] = useViewState('placementOfficer', 'ReviewOpportunities', () => ({
+    activeStatus: 'all',
+    typeFilter: 'all',
+    openCards: {},
+    rejectModalOpen: false,
+    rejectTarget: null,
+    rejectRemarks: '',
+    rejectError: false,
+  }));
 
   const act = async (request) => {
     try {

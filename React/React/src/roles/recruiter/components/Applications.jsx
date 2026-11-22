@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Star, Filter, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useViewState } from '../../../store/useViewState.js';
+import { Search, Star } from 'lucide-react';
 import CandidateModal from './CandidateModal';
 
 export default function Applications({ 
@@ -9,10 +9,15 @@ export default function Applications({
   setSelectedRoleFilter,
   onSchedule
 }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterReferred, setFilterReferred] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+  const [
+    { searchTerm, filterReferred, statusFilter, selectedCandidateId },
+    { setSearchTerm, setFilterReferred, setStatusFilter, setSelectedCandidateId },
+  ] = useViewState('recruiter', 'Applications', () => ({
+    searchTerm: '',
+    filterReferred: false,
+    statusFilter: 'All',
+    selectedCandidateId: null,
+  }));
   const selectedCandidate = applications.find((app) => app.id === selectedCandidateId);
 
   const statuses = ['All', 'Applied', 'Shortlisted', 'Interview', 'Offered', 'Rejected', 'Withdrawn'];

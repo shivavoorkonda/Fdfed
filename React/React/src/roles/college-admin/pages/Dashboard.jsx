@@ -1,16 +1,13 @@
-import React, { useState } from "react";
 import {
   ShieldCheck,
   GraduationCap,
   Users,
   TrendingUp,
-  Building2,
   ArrowRight,
   Megaphone,
   BarChart2,
   AlertTriangle,
   CheckCircle,
-  Activity,
   UserPlus,
   Clock,
 } from "lucide-react";

@@ -1,4 +1,3 @@
-import React from 'react';
 import { BarChart2, Award, TrendingUp, GraduationCap, Users, CheckCircle, Clock } from 'lucide-react';
 
 // Build department-wise stats from the real students array

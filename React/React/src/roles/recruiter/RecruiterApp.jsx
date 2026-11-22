@@ -1,4 +1,6 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import { useViewState } from '../../store/useViewState.js';
+import { useEffect, useCallback } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
@@ -10,79 +12,48 @@ import CandidatesFilter from './components/CandidatesFilter';
 import HiringReport from './components/HiringReport';
 import Profile from './components/Profile';
 import SignOutModal from './components/SignOutModal';
-import api, { clearSession, errorMessage, readSession } from '../../services/api.js';
-import { fetchRecruiterData, fromOpportunity } from './data/api.js';
+import api, { errorMessage, readSession } from '../../services/api.js';
+import { fromOpportunity } from './data/api.js';
 import { infoDialog } from '../../shared/components/AppDialog.jsx';
-import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
+import { savePage } from '../../shared/utils/navigationState.js';
+import { useLogout, useUpdateSession } from '../../shared/context/AuthContext.jsx';
+import { RECRUITER_TAB_KEY, RECRUITER_TABS, initialsOf, recruiterActions, selectOpportunitiesWithCount, selectRecruiter } from '../../store/recruiter/recruiterSlice.js';
+import { loadRecruiterWorkspace } from '../../store/recruiter/recruiterRequests.js';
+import { selectSession, selectWorkspaceVersion } from '../../store/sessionSlice.js';
+import useWorkspaceDispatch from '../../store/useWorkspaceDispatch.js';
 import './styles/Recruiter.css';
 
-const initialsOf = (name = '') => name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'RC';
-const RECRUITER_TABS = ['dashboard', 'post', 'opportunities', 'applications', 'assessments', 'candidates', 'reports', 'profile'];
-const RECRUITER_TAB_KEY = 'cn_active_recruiter_tab';
-
 export default function RecruiterApp() {
-  // Navigation State
-  const [activeTab, setActiveTabState] = useState(() => readSavedPage(RECRUITER_TAB_KEY, 'dashboard', RECRUITER_TABS));
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState('All Roles');
-  const [scheduleFor, setScheduleFor] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const workspace = useSelector(selectRecruiter, shallowEqual);
+  const opportunitiesWithCount = useSelector(selectOpportunitiesWithCount);
+  const sessionId = useSelector(selectSession)?.id;
+  const workspaceVersion = useSelector(selectWorkspaceVersion);
+  const reduxDispatch = useDispatch();
+  const dispatch = useWorkspaceDispatch();
+  const confirmSignOut = useLogout();
+  const updateSession = useUpdateSession();
+  const { selectedRoleFilter, scheduleFor, notifications, recruiter, opportunities, applications, assessments } = workspace;
+  const activeTab = workspace.activeTab;
+  const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('recruiter', 'RecruiterApp', () => ({
+    isSignOutOpen: false,
+  }));
 
   const setActiveTab = useCallback((tab) => {
     const nextTab = RECRUITER_TABS.includes(tab) ? tab : 'dashboard';
     savePage(RECRUITER_TAB_KEY, nextTab);
-    setActiveTabState(nextTab);
-  }, []);
+    dispatch(recruiterActions.tabChanged(nextTab));
+  }, [dispatch]);
 
-  // 1. Recruiter profile (the logged-in user, kept in sync with the API)
-  const [recruiter, setRecruiter] = useState(() => {
-    const parsed = readSession() || {};
-    return {
-      name: parsed.name || '',
-      role: parsed.headline || 'Recruiter',
-      email: parsed.email || '',
-      avatar: parsed.avatar || initialsOf(parsed.name),
-      company: parsed.company || '',
-      department: parsed.department || '',
-      phone: parsed.phone || '',
-      location: parsed.location || '',
-      joinedDate: parsed.joinedDate || '',
-    };
-  });
+  const setSelectedRoleFilter = (filter) => dispatch(recruiterActions.roleFilterChanged(filter));
+  const setScheduleFor = (applicationId) => dispatch(recruiterActions.scheduleSelectionChanged(applicationId));
 
-  // 2-5. Opportunities, applications, assessments and the candidate pool come from the API.
-  const [opportunities, setOpportunities] = useState([]);
-  const [applications, setApplications] = useState([]);
-  const [assessments, setAssessments] = useState([]);
-
-  const reloadVersion = useRef(0);
-  const reload = async () => {
-    const version = ++reloadVersion.current;
-    const data = await fetchRecruiterData();
-    if (version !== reloadVersion.current) return;
-    setOpportunities(data.opportunities);
-    setApplications(data.applications);
-    setAssessments(data.assessments);
-    setNotifications(data.notifications);
-  };
+  const reload = () => reduxDispatch(loadRecruiterWorkspace({ workspaceVersion })).unwrap();
 
   useEffect(() => {
-    const session = readSession();
     reload().catch((error) => showToast(errorMessage(error, 'Could not load your data.')));
-    if (session) {
-      api.get(`/users/${session.id}`).then(({ data: user }) => {
-        setRecruiter((prev) => ({
-          ...prev,
-          name: user.name,
-          email: user.email,
-          role: user.headline || 'Recruiter',
-          avatar: user.avatar || initialsOf(user.name),
-          company: user.company || '',
-          department: user.department || '',
-          phone: user.phone || '',
-          location: user.location || '',
-          joinedDate: user.joinedDate || prev.joinedDate,
-        }));
+    if (sessionId != null) {
+      api.get(`/users/${sessionId}`).then(({ data: user }) => {
+        dispatch(recruiterActions.profileLoaded(user));
       }).catch(() => {});
     }
     // New applications and updates arrive while the recruiter is on the page.
@@ -90,14 +61,6 @@ export default function RecruiterApp() {
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Applicant counts per opportunity, from the live applications
-  const opportunitiesWithCount = useMemo(() => {
-    return opportunities.map(opp => ({
-      ...opp,
-      applications: applications.filter(a => a.opportunityId === opp.id).length
-    }));
-  }, [opportunities, applications]);
 
   // Toast Helper
   const showToast = (msg) => {
@@ -185,8 +148,10 @@ export default function RecruiterApp() {
         company: updatedData.company,
         headline: updatedData.role,
       });
-      setRecruiter((prev) => ({ ...prev, ...updatedData, avatar: user.avatar || initialsOf(user.name) }));
-      localStorage.setItem('loggedInUser', JSON.stringify({ ...session, name: user.name, company: user.company }));
+      const applied = dispatch(recruiterActions.profileUpdated({ ...updatedData, avatar: user.avatar || initialsOf(user.name) }));
+      if (!applied) return false;
+      const nextSession = { ...session, name: user.name, company: user.company };
+      updateSession(nextSession);
       showToast('Profile information saved successfully!');
       return true;
     } catch (error) {
@@ -196,10 +161,6 @@ export default function RecruiterApp() {
   };
 
   const handleSignOut = () => setIsSignOutOpen(true);
-  const confirmSignOut = () => {
-    clearSession();
-    window.location.replace('/login');
-  };
 
   // Determine current page title
   const getPageTitle = () => {
@@ -236,7 +197,7 @@ export default function RecruiterApp() {
           onSignOut={handleSignOut}
           notifications={notifications}
           onMarkAllRead={async () => {
-            setNotifications((list) => list.map((n) => ({ ...n, isRead: true })));
+            dispatch(recruiterActions.notificationsRead());
             await api.patch('/notifications/read-all').catch(() => {});
           }}
         />
@@ -293,7 +254,6 @@ export default function RecruiterApp() {
         {activeTab === 'candidates' && (
           <CandidatesFilter 
             applications={applications}
-            opportunities={opportunitiesWithCount}
             onBulkShortlist={handleBulkShortlist}
             onUpdateStatus={handleUpdateApplicationStatus}
           />

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   LayoutDashboard, Building2, UserCog, Activity, Crown, LogOut, MessageSquare
 } from 'lucide-react';

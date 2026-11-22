@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function SignOutModal({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;

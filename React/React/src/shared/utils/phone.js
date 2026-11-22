@@ -1,4 +1,4 @@
-export const PHONE_MESSAGE =
+const PHONE_MESSAGE =
   "Phone number must contain exactly 10 digits, with no spaces or special characters.";
 export const phoneError = (value, required = false) =>
   !value && !required

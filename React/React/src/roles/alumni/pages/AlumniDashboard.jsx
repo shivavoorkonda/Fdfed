@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 import Sidebar from '../components/Sidebar';
 import SignOutModal from '../components/SignOutModal';
 import '../styles/Alumni.css';
@@ -9,8 +9,13 @@ export default function AlumniDashboard({
   onUpdateReferralStatus,
   onNavigate,
 }) {
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
-  const [fadingCardId, setFadingCardId] = useState(null);
+  const [
+    { isSignOutOpen, fadingCardId },
+    { setIsSignOutOpen, setFadingCardId },
+  ] = useViewState('alumni', 'AlumniDashboard', () => ({
+    isSignOutOpen: false,
+    fadingCardId: null,
+  }));
 
   const alumni = alumniData || {};
 

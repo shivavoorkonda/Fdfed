@@ -1,5 +1,7 @@
+import { useViewState } from '../../store/useViewState.js';
 import { infoDialog } from '../../shared/components/AppDialog.jsx';
-import React, { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
 import SuperAdminSidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import SADashboard from './pages/Dashboard';
@@ -9,10 +11,12 @@ import ActivityLog from './pages/ActivityLog';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
 import SignOutModal from './components/SignOutModal';
-import { clearSession } from '../../services/api.js';
+import { useLogout, useUpdateSession } from '../../shared/context/AuthContext.jsx';
+import { SUPER_ADMIN_TAB_KEY, SUPER_ADMIN_TABS, superAdminActions, selectSuperAdmin } from '../../store/super-admin/superAdminSlice.js';
+import { selectSession } from '../../store/sessionSlice.js';
+import useWorkspaceDispatch from '../../store/useWorkspaceDispatch.js';
 import { usePlatformData } from '../../shared/context/PlatformDataContext.jsx';
-import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { savePage } from '../../shared/utils/navigationState.js';
 import './styles/SuperAdmin.css';
 
 function getInitials(name = '') {
@@ -31,35 +35,30 @@ function getTitle(tab) {
   }
 }
 
-const SUPER_ADMIN_TABS = ['dashboard', 'colleges', 'college-admins', 'activity', 'messages', 'profile'];
-const SUPER_ADMIN_TAB_KEY = 'cn_active_super_admin_tab';
-
 export default function SuperAdminApp() {
   const platform = usePlatformData();
   const { data, stats } = platform;
-  const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('loggedInUser');
-    try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
-  });
+  const user = useSelector(selectSession);
+  const dispatch = useWorkspaceDispatch();
+  const confirmSignOut = useLogout();
+  const updateSession = useUpdateSession();
+  const workspace = useSelector(selectSuperAdmin, shallowEqual);
   const userName = user.name || localStorage.getItem('userName') || 'Super Admin';
 
-  const [activeTab, setActiveTab] = useState(() => readSavedPage(SUPER_ADMIN_TAB_KEY, 'dashboard', SUPER_ADMIN_TABS));
-  const [adminCollegeId, setAdminCollegeId] = useState(null);
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const activeTab = workspace.activeTab;
+  const { adminCollegeId } = workspace;
+  const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('superAdmin', 'SuperAdminApp', () => ({
+    isSignOutOpen: false,
+  }));
 
   const showToast = useCallback((msg) => { infoDialog(msg); }, []);
 
   const handleSignOut = () => setIsSignOutOpen(true);
-  const confirmSignOut = () => {
-    clearSession();
-    window.location.replace('/login');
-  };
 
   const handleTabChange = (tab) => {
     const nextTab = SUPER_ADMIN_TABS.includes(tab) ? tab : 'dashboard';
     savePage(SUPER_ADMIN_TAB_KEY, nextTab);
-    setActiveTab(nextTab);
-    if (nextTab !== 'college-admins') setAdminCollegeId(null);
+    dispatch(superAdminActions.tabChanged(nextTab));
   };
 
   const pageProps = {
@@ -67,7 +66,7 @@ export default function SuperAdminApp() {
     stats,
     platform,
     showToast, setActiveTab: handleTabChange,
-    adminCollegeId, setAdminCollegeId,
+    adminCollegeId, setAdminCollegeId: (id) => dispatch(superAdminActions.adminCollegeChanged(id)),
   };
 
   return (
@@ -96,7 +95,7 @@ export default function SuperAdminApp() {
             {activeTab === 'college-admins' && <CollegeAdmins {...pageProps} />}
             {activeTab === 'activity'       && <ActivityLog />}
             {activeTab === 'messages'       && <Messages colleges={data.colleges} />}
-            {activeTab === 'profile'        && <Profile showToast={showToast} onProfileUpdated={setUser} />}
+            {activeTab === 'profile'        && <Profile showToast={showToast} onProfileUpdated={updateSession} />}
           </div>
         </div>
 

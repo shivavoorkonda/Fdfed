@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useMemo } from 'react';
 import { useStore } from '../context/StoreContext.jsx';
 import '../styles/features.css';
 
@@ -14,7 +15,9 @@ function statusChipFor(status) {
 
 export default function ApplicationTracker() {
     const { store } = useStore();
-    const [filter, setFilter] = useState('All');
+    const [{ filter }, { setFilter }] = useViewState('candidate', 'ApplicationTracker', () => ({
+      filter: 'All',
+    }));
 
     const stats = useMemo(() => {
         const apps = store.myApplications;

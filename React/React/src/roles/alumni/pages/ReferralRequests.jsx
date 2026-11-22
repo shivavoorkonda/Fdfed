@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 import Sidebar from '../components/Sidebar';
 import ResumeModal from '../components/ResumeModal';
 import DeclineModal from '../components/DeclineModal';
@@ -13,13 +13,18 @@ export default function ReferralRequests({
   onUpdateReferralStatus,
   onNavigate,
 }) {
-  const [currentFilter, setCurrentFilter] = useState(initialFilter);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [openCards, setOpenCards] = useState(() => (openCardId ? { [openCardId]: true } : {}));
-  const [replyMessages, setReplyMessages] = useState({});
-  const [resumeModalData, setResumeModalData] = useState({ isOpen: false, candidateName: '', candidateId: '' });
-  const [declineModalData, setDeclineModalData] = useState({ isOpen: false, candidateId: null, candidateName: '' });
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const [
+    { currentFilter, searchQuery, openCards, replyMessages, resumeModalData, declineModalData, isSignOutOpen },
+    { setCurrentFilter, setSearchQuery, setOpenCards, setReplyMessages, setResumeModalData, setDeclineModalData, setIsSignOutOpen },
+  ] = useViewState('alumni', 'ReferralRequests', () => ({
+    currentFilter: initialFilter,
+    searchQuery: '',
+    openCards: openCardId ? { [openCardId]: true } : {},
+    replyMessages: {},
+    resumeModalData: { isOpen: false, candidateName: '', candidateId: '' },
+    declineModalData: { isOpen: false, candidateId: null, candidateName: '' },
+    isSignOutOpen: false,
+  }));
 
   const alumni = alumniData || {};
 

@@ -1,5 +1,5 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
-import React, { useState } from 'react';
 import { errorMessage } from '../../../services/api.js';
 import { Plus, ShieldCheck, Building2 } from 'lucide-react';
 
@@ -47,10 +47,15 @@ function validateField(key, raw, existing = []) {
 }
 
 function AddCollegeModal({ onClose, onSave, existing }) {
-  const [form, setForm] = useState({ name: '', code: '', email: '', phone: '', address: '', website: '' });
-  const [touched, setTouched] = useState({});
-  const [error, setError] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [
+    { form, touched, error, saving },
+    { setForm, setTouched, setError, setSaving },
+  ] = useViewState('superAdmin', 'AddCollegeModal', () => ({
+    form: { name: '', code: '', email: '', phone: '', address: '', website: '' },
+    touched: {},
+    error: '',
+    saving: false,
+  }));
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: k === 'code' ? v.toUpperCase() : v }));
   const errors = Object.fromEntries(FIELD_META.map(({ key }) => [key, validateField(key, form[key], existing)]));
@@ -120,8 +125,13 @@ function StatusModal({ college, onClose, onSave }) {
 }
 
 export default function Colleges({ colleges, platform, showToast, setActiveTab, setAdminCollegeId }) {
-  const [showAdd, setShowAdd]       = useState(false);
-  const [statusTarget, setStatusTarget] = useState(null);
+  const [
+    { showAdd, statusTarget },
+    { setShowAdd, setStatusTarget },
+  ] = useViewState('superAdmin', 'Colleges', () => ({
+    showAdd: false,
+    statusTarget: null,
+  }));
 
   const handleAddCollege = async (newCol) => {
     if (colleges.some((college) => college.code.toLowerCase() === newCol.code.toLowerCase())) {

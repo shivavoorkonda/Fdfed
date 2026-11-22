@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext.jsx';
 import { Avatar, ReferralPill, normReferralStatus } from '../components/shared.jsx';
@@ -14,7 +15,9 @@ const TABS = [
 export default function Referrals() {
     const { store } = useStore();
     const navigate = useNavigate();
-    const [tab, setTab] = useState('all');
+    const [{ tab }, { setTab }] = useViewState('candidate', 'Referrals', () => ({
+      tab: 'all',
+    }));
 
     const requests = useMemo(
         () => [...store.referralRequests].sort((a, b) => b.id - a.id),

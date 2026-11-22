@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
 import { X } from "lucide-react";
 import {
   allBranches,
@@ -6,8 +6,10 @@ import {
   validateLocation,
 } from "../data/opportunityValidation.js";
 export function LocationAdder({ locations, setLocations }) {
-  const [cur, setCur] = useState("");
-  const [err, setErr] = useState("");
+  const [{ cur, err }, { setCur, setErr }] = useViewState('recruiter', 'LocationAdder', () => ({
+    cur: "",
+    err: "",
+  }));
 
   const add = () => {
     const t = cur.trim();
@@ -76,8 +78,10 @@ export function LocationAdder({ locations, setLocations }) {
 }
 
 export function SkillAdder({ skills, setSkills }) {
-  const [cur, setCur] = useState("");
-  const [err, setErr] = useState("");
+  const [{ cur, err }, { setCur, setErr }] = useViewState('recruiter', 'SkillAdder', () => ({
+    cur: "",
+    err: "",
+  }));
 
   const add = (e) => {
     e?.preventDefault();

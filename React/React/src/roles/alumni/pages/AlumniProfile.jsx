@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 import { Building2, GraduationCap, UserRound } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import SignOutModal from '../components/SignOutModal';
 import ChangePasswordModal from '../../../shared/components/ChangePasswordModal';
-import { readSession } from '../../../services/api.js';
+import { useSelector } from 'react-redux';
+import { selectSession } from '../../../store/sessionSlice.js';
 import '../styles/Alumni.css';
 
 export default function AlumniProfile({
@@ -16,19 +17,34 @@ export default function AlumniProfile({
   skillsList,
   onSetSkillsList,
 }) {
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const session = readSession() || {};
+  const [
+    { isSignOutOpen, isChangePasswordOpen },
+    { setIsSignOutOpen, setIsChangePasswordOpen },
+  ] = useViewState('alumni', 'AlumniProfile', () => ({
+    isSignOutOpen: false,
+    isChangePasswordOpen: false,
+  }));
+  const userId = useSelector(selectSession)?.id;
 
   // Personal info edit state
-  const [isEditing, setIsEditing] = useState(false);
-  const [editFields, setEditFields] = useState({});
-  const [isEditingSocials, setIsEditingSocials] = useState(false);
-  const [editSocials, setEditSocials] = useState({});
+  const [
+    { isEditing, editFields, isEditingSocials, editSocials },
+    { setIsEditing, setEditFields, setIsEditingSocials, setEditSocials },
+  ] = useViewState('alumni', 'AlumniProfile/isEditing', () => ({
+    isEditing: false,
+    editFields: {},
+    isEditingSocials: false,
+    editSocials: {},
+  }));
 
   // Skills UI state
-  const [newSkill, setNewSkill] = useState('');
-  const [showAddSkill, setShowAddSkill] = useState(false);
+  const [
+    { newSkill, showAddSkill },
+    { setNewSkill, setShowAddSkill },
+  ] = useViewState('alumni', 'AlumniProfile/newSkill', () => ({
+    newSkill: '',
+    showAddSkill: false,
+  }));
 
   const alumni = alumniData || {};
 
@@ -434,7 +450,7 @@ export default function AlumniProfile({
       <ChangePasswordModal
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
-        userId={session.id}
+        userId={userId}
         accentColor="#e76a00"
       />
     </div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+
 import {
   LocationAdder,
   SkillAdder,
@@ -16,7 +17,7 @@ import {
   validateSkill,
 } from "../data/opportunityValidation.js";
 
-export const compensationAmount = (value) =>
+const compensationAmount = (value) =>
   String(value || "")
     .replace(/,/g, "")
     .match(/\d+(?:\.\d+)?/)?.[0] || "";
@@ -27,16 +28,19 @@ export default function OpportunityEditor({
   onSave,
   onClose,
 }) {
-  const [form, setForm] = useState({ ...opportunity });
-  const [locations, setLocations] = useState(
-    (opportunity.location || "")
-      .split("|")
-      .map((value) => value.trim())
-      .filter(Boolean),
-  );
-  const [amount, setAmount] = useState(compensationAmount(opportunity.ctc));
-  const [errors, setErrors] = useState({});
-  const [saving, setSaving] = useState(false);
+  const [
+    { form, locations, amount, errors, saving },
+    { setForm, setLocations, setAmount, setErrors, setSaving },
+  ] = useViewState('recruiter', 'OpportunityEditor', () => ({
+    form: { ...opportunity },
+    locations: (opportunity.location || "")
+        .split("|")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    amount: compensationAmount(opportunity.ctc),
+    errors: {},
+    saving: false,
+  }));
   const locked = ["published", "closed"].includes(
     opportunity.status.toLowerCase(),
   );

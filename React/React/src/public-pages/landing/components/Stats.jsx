@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useRef } from "react";
 
 const stats = [
   {
@@ -29,8 +30,10 @@ const stats = [
 
 function Stats() {
   const sectionRef = useRef(null);
-  const [started, setStarted] = useState(false);
-  const [values, setValues] = useState(stats.map(() => 0));
+  const [{ started, values }, { setStarted, setValues }] = useViewState('publicPages', 'Stats', () => ({
+    started: false,
+    values: stats.map(() => 0),
+  }));
 
   useEffect(() => {
     const observer = new IntersectionObserver(

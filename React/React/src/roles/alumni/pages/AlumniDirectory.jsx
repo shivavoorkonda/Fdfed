@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
 import SignOutModal from '../components/SignOutModal';
 import featuresApi from '../data/featuresApi';
@@ -21,13 +22,18 @@ const DEPT_CODES = {
 };
 
 export default function AlumniDirectory({ alumniData, onNavigate }) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [batch, setBatch] = useState('');
-  const [dept, setDept] = useState('');
-  const [alumniList, setAlumniList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const [
+    { searchQuery, batch, dept, alumniList, loading, errorMessage, isSignOutOpen },
+    { setSearchQuery, setBatch, setDept, setAlumniList, setLoading, setErrorMessage, setIsSignOutOpen },
+  ] = useViewState('alumni', 'AlumniDirectory', () => ({
+    searchQuery: '',
+    batch: '',
+    dept: '',
+    alumniList: [],
+    loading: false,
+    errorMessage: '',
+    isSignOutOpen: false,
+  }));
 
   const applyFilters = useCallback((query, batchParam, deptParam) => {
     setLoading(true);

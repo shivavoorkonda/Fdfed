@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './styles/p1.css';
@@ -12,15 +13,19 @@ const TARGETS = [
 ];
 
 export default function BulkNotify({ onNavigate, activePage = 'bulk-notify' }) {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [targetGroup, setTargetGroup] = useState('students');
-  const [sending, setSending] = useState(false);
-  const [successInfo, setSuccessInfo] = useState('');
-  const [sendError, setSendError] = useState('');
-  const [formErrors, setFormErrors] = useState({ title: '', message: '' });
-
-  const [history, setHistory] = useState([]);
+  const [
+    { title, message, targetGroup, sending, successInfo, sendError, formErrors, history },
+    { setTitle, setMessage, setTargetGroup, setSending, setSuccessInfo, setSendError, setFormErrors, setHistory },
+  ] = useViewState('placementOfficer', 'BulkNotify', () => ({
+    title: '',
+    message: '',
+    targetGroup: 'students',
+    sending: false,
+    successInfo: '',
+    sendError: '',
+    formErrors: { title: '', message: '' },
+    history: [],
+  }));
 
   const loadHistory = () =>
     api.get('/features/officer/notifications')

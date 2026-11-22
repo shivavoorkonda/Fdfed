@@ -1,7 +1,10 @@
+import { useViewState } from '../../../store/useViewState.js';
 import { phoneError, phoneInputProps } from '../../../shared/utils/phone.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ExternalLink, Mail, ShieldCheck, User } from 'lucide-react';
-import api, { errorMessage, readSession } from '../../../services/api.js';
+import { useSelector } from 'react-redux';
+import api, { errorMessage } from '../../../services/api.js';
+import { selectSession } from '../../../store/sessionSlice.js';
 import ChangePasswordModal from '../../../shared/components/ChangePasswordModal.jsx';
 
 const EMPTY_EDIT_FIELDS = {
@@ -9,13 +12,18 @@ const EMPTY_EDIT_FIELDS = {
 };
 
 export default function Profile({ showToast, onProfileUpdated }) {
-  const session = readSession() || {};
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [fields, setFields] = useState(EMPTY_EDIT_FIELDS);
-  const [saving, setSaving] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const session = useSelector(selectSession) || {};
+  const [
+    { profile, loading, isEditing, fields, saving, isChangePasswordOpen },
+    { setProfile, setLoading, setIsEditing, setFields, setSaving, setIsChangePasswordOpen },
+  ] = useViewState('superAdmin', 'Profile', () => ({
+    profile: null,
+    loading: true,
+    isEditing: false,
+    fields: EMPTY_EDIT_FIELDS,
+    saving: false,
+    isChangePasswordOpen: false,
+  }));
 
   useEffect(() => {
     let active = true;
@@ -58,8 +66,7 @@ export default function Profile({ showToast, onProfileUpdated }) {
       });
       setProfile(updated);
       const nextSession = { ...session, name: updated.name, email: updated.email };
-      localStorage.setItem('loggedInUser', JSON.stringify(nextSession));
-      onProfileUpdated?.(nextSession);
+      if (onProfileUpdated?.(nextSession) === false) return;
       setIsEditing(false);
       showToast?.('Profile updated successfully!');
     } catch (error) {

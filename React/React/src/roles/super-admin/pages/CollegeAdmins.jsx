@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
 import { errorMessage } from '../../../services/api.js';
 import { collegeEmailDomain, collegeEmailError } from '../../../shared/utils/collegeEmail.js';
-import { ArrowLeft, UserPlus, Ban, CheckCircle, AlertTriangle, ShieldCheck, Users } from 'lucide-react';
+import { ArrowLeft, UserPlus, Ban, CheckCircle, AlertTriangle } from 'lucide-react';
 
 function AssignAdminModal({ college, onClose, onSave }) {
   const emailDomain = collegeEmailDomain(college);
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [error, setError] = useState('');
+  const [{ form, error }, { setForm, setError }] = useViewState('superAdmin', 'AssignAdminModal', () => ({
+    form: { name: '', email: '', password: '' },
+    error: '',
+  }));
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = () => {
@@ -136,7 +138,9 @@ function CollegeAdminPanel({ college, onAssign, onToggleStatus }) {
 }
 
 export default function CollegeAdmins({ colleges, platform, showToast, adminCollegeId, setAdminCollegeId }) {
-  const [assignTarget, setAssignTarget] = useState(null);
+  const [{ assignTarget }, { setAssignTarget }] = useViewState('superAdmin', 'CollegeAdmins', () => ({
+    assignTarget: null,
+  }));
 
   const selectedCollege = adminCollegeId ? colleges.find(c => c.id === adminCollegeId) : null;
 

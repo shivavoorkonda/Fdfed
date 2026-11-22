@@ -1,11 +1,4 @@
 /* ================== OPPORTUNITIES PAGE STYLES ================== */
-.cn-candidate .nav-item.active-opportunities a {
-    background-color: var(--bg-main);
-    color: var(--brand-primary);
-}
-.cn-candidate .nav-item.active-opportunities a i {
-    color: var(--brand-primary);
-}
 
 /* Toolbar */
 .cn-candidate .opportunities-toolbar {
@@ -155,7 +148,6 @@
     font-weight: 600;
 }
 .cn-candidate .text-applied { color: #16a34a; }
-.cn-candidate .text-ineligible { color: #ef4444; }
 
 /* Right Col: Details View */
 .cn-candidate .job-details-col {

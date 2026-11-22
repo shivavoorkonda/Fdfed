@@ -1,10 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useRef, useEffect } from 'react';
 import { Bell, User, LogOut } from 'lucide-react';
 
 export default function Navbar({ title, recruiter, setActiveTab, onSignOut, notifications = [], onMarkAllRead }) {
   const unread = notifications.filter((n) => !n.isRead).length;
-  const [showNotifs, setShowNotifs] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [
+    { showNotifs, showProfileMenu },
+    { setShowNotifs, setShowProfileMenu },
+  ] = useViewState('recruiter', 'Navbar', () => ({
+    showNotifs: false,
+    showProfileMenu: false,
+  }));
   const notifRef = useRef(null);
   const profileRef = useRef(null);
 

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect } from 'react';
 import {
   MessageSquare, Send, UserCog, Users, AlertTriangle,
   CheckCircle, RefreshCw, Clock, Building2, XCircle
@@ -7,12 +8,19 @@ import { usePlatformData } from '../../../shared/context/PlatformDataContext.jsx
 import { errorMessage } from '../../../services/api.js';
 
 function ComposeForm({ colleges, onSend }) {
-  const [toType,  setToType]  = useState('one');   // 'one' | 'all'
-  const [toId,    setToId]    = useState('');
-  const [subject, setSubject] = useState('');
-  const [body,    setBody]    = useState('');
-  const [sending, setSending] = useState(false);
-  const [formErr, setFormErr] = useState('');
+  const [{ toType }, { setToType }] = useViewState('superAdmin', 'ComposeForm', () => ({
+    toType: 'one',
+  }));   // 'one' | 'all'
+  const [
+    { toId, subject, body, sending, formErr },
+    { setToId, setSubject, setBody, setSending, setFormErr },
+  ] = useViewState('superAdmin', 'ComposeForm/toId', () => ({
+    toId: '',
+    subject: '',
+    body: '',
+    sending: false,
+    formErr: '',
+  }));
 
   const adminsOnly = colleges.filter(c => c.admin);
 
@@ -202,10 +210,15 @@ function SentList({ messages, loading, err, onRefresh }) {
 
 export default function Messages({ colleges }) {
   const { sendMessage, getSentMessages } = usePlatformData();
-  const [messages, setMessages] = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [err,      setErr]      = useState('');
-  const [toast,    setToast]    = useState(null);
+  const [
+    { messages, loading, err, toast },
+    { setMessages, setLoading, setErr, setToast },
+  ] = useViewState('superAdmin', 'Messages', () => ({
+    messages: [],
+    loading: true,
+    err: '',
+    toast: null,
+  }));
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });

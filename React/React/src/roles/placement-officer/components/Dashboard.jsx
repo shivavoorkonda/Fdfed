@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './styles/p1.css';
 import './styles/dashboard.css';
 import { useOfficerData } from '../services/officerApi';
-import { BadgeCheck, BriefcaseBusiness, Building2, CalendarClock, Clock3, Globe2, GraduationCap, Handshake, RefreshCw, UsersRound } from 'lucide-react';
+import { BadgeCheck, BriefcaseBusiness, Building2, CalendarClock, Clock3, GraduationCap, Handshake, RefreshCw, UsersRound } from 'lucide-react';
 
 export default function Dashboard({ onNavigate, activePage = 'p1' }) {
   const { data, refresh, ready, error } = useOfficerData();
   const { stats, stakeholders, drives, interviews, announcements = [] } = data;
   const submissions = (data.submissions || []).slice(0, 6);
-  const [alertDismissed, setAlertDismissed] = useState(false);
-  const alertVisible = stats.pending > 0 && !alertDismissed;
-  const setAlertVisible = (visible) => setAlertDismissed(!visible);
+  const alertVisible = stats.pending > 0;
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);

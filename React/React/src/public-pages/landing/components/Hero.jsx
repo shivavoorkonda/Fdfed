@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+import { useEffect, useMemo } from "react";
 
 const heroImages = [
   "https://img.collegepravesh.com/2023/03/IIIT-Sri-City.jpg",
@@ -7,7 +8,9 @@ const heroImages = [
 ];
 
 function Hero() {
-  const [currentImage, setCurrentImage] = useState(0);
+  const [{ currentImage }, { setCurrentImage }] = useViewState('publicPages', 'Hero', () => ({
+    currentImage: 0,
+  }));
 
   useEffect(() => {
     heroImages.forEach((src) => {

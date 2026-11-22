@@ -1,5 +1,7 @@
+import { useViewState } from '../../store/useViewState.js';
 import { infoDialog } from '../../shared/components/AppDialog.jsx';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
 import CollegeAdminSidebar from './components/Sidebar';
 import CATopbar from './components/Topbar';
 import CADashboard from './pages/Dashboard';
@@ -12,10 +14,13 @@ import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import SignOutModal from './components/SignOutModal';
 import Messages from './pages/Messages';
-import api, { clearSession } from '../../services/api.js';
+import api from '../../services/api.js';
+import { useLogout, useUpdateSession } from '../../shared/context/AuthContext.jsx';
+import { COLLEGE_ADMIN_TAB_KEY, COLLEGE_ADMIN_TABS, collegeAdminActions, selectCollegeAdmin } from '../../store/college-admin/collegeAdminSlice.js';
+import { selectSession } from '../../store/sessionSlice.js';
+import useWorkspaceDispatch from '../../store/useWorkspaceDispatch.js';
 import { usePlatformData } from '../../shared/context/PlatformDataContext.jsx';
-import { readSavedPage, savePage } from '../../shared/utils/navigationState.js';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { savePage } from '../../shared/utils/navigationState.js';
 import './styles/CollegeAdmin.css';
 
 function getInitials(name = '') {
@@ -38,34 +43,38 @@ function getTitle(tab) {
   }
 }
 
-const COLLEGE_ADMIN_TABS = ['dashboard', 'officers', 'students', 'alumni', 'recruiters', 'activity', 'announcements', 'messages', 'reports', 'profile'];
-const COLLEGE_ADMIN_TAB_KEY = 'cn_active_college_admin_tab';
-
 export default function CollegeAdminApp() {
   const platform = usePlatformData();
   const { data }  = platform;
-  const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('loggedInUser');
-    try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
-  });
+  const user = useSelector(selectSession);
+  const dispatch = useWorkspaceDispatch();
+  const confirmSignOut = useLogout();
+  const updateSession = useUpdateSession();
+  const workspace = useSelector(selectCollegeAdmin, shallowEqual);
   const userName = user.name || localStorage.getItem('userName') || 'College Admin';
 
-  const [activeTab, setActiveTabState] = useState(() => readSavedPage(COLLEGE_ADMIN_TAB_KEY, 'dashboard', COLLEGE_ADMIN_TABS));
-  const [unread, setUnread]       = useState(0);
-  const [isSignOutOpen, setIsSignOutOpen] = useState(false);
+  const activeTab = workspace.activeTab;
+  const { unread } = workspace;
+  const [{ isSignOutOpen }, { setIsSignOutOpen }] = useViewState('collegeAdmin', 'CollegeAdminApp', () => ({
+    isSignOutOpen: false,
+  }));
 
   // Messages from the super admin: badge = how many arrived since the admin last opened the inbox.
   const seenKey = `ca_messages_seen_${Number(user.collegeId) || 1}`;
   useEffect(() => {
     const check = () => api.get('/super-admin/inbox').then(({ data }) => {
       const seen = Number(localStorage.getItem(seenKey) || 0);
-      setUnread(data.filter((m) => new Date(m.sentAt).getTime() > seen).length);
+      const unreadCount = data.filter((m) => new Date(m.sentAt).getTime() > seen).length;
+      dispatch(collegeAdminActions.unreadChanged(unreadCount));
     }).catch(() => {});
     check();
     const timer = setInterval(check, 20000);
     return () => clearInterval(timer);
-  }, [seenKey]);
-  const markMessagesSeen = () => { localStorage.setItem(seenKey, String(Date.now())); setUnread(0); };
+  }, [dispatch, seenKey]);
+  const markMessagesSeen = () => {
+    localStorage.setItem(seenKey, String(Date.now()));
+    dispatch(collegeAdminActions.unreadChanged(0));
+  };
 
   const collegeId   = Number(user.collegeId) || 1;
   const collegeInfo = data.colleges.find(c => c.id === collegeId) || data.colleges[0] || { name: '' };
@@ -89,14 +98,10 @@ export default function CollegeAdminApp() {
   const setActiveTab = useCallback((tab) => {
     const nextTab = COLLEGE_ADMIN_TABS.includes(tab) ? tab : 'dashboard';
     savePage(COLLEGE_ADMIN_TAB_KEY, nextTab);
-    setActiveTabState(nextTab);
-  }, []);
+    dispatch(collegeAdminActions.tabChanged(nextTab));
+  }, [dispatch]);
 
   const handleSignOut = () => setIsSignOutOpen(true);
-  const confirmSignOut = () => {
-    clearSession();
-    window.location.replace('/login');
-  };
 
   const sharedProps = {
     officers, students, platform, alumniCount, applications,
@@ -140,7 +145,7 @@ export default function CollegeAdminApp() {
             {activeTab === 'announcements' && <Announcements   collegeName={collegeInfo.name} />}
             {activeTab === 'messages'      && <Messages        onSeen={markMessagesSeen} />}
             {activeTab === 'reports'       && <Reports         students={students} collegeName={collegeInfo.name} placedStudentIds={placedStudentIds} />}
-            {activeTab === 'profile'       && <Profile collegeName={collegeInfo.name} showToast={showToast} onProfileUpdated={setUser} />}
+            {activeTab === 'profile'       && <Profile collegeName={collegeInfo.name} showToast={showToast} onProfileUpdated={updateSession} />}
           </div>
         </div>
 

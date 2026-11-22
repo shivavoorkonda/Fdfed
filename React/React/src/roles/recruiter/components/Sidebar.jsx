@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   LayoutDashboard, 
   Send, 
@@ -7,7 +6,6 @@ import {
   CalendarCheck, 
   Filter, 
   BarChart2, 
-  User, 
   LogOut 
 } from 'lucide-react';
 

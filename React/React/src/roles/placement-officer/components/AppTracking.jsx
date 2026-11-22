@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useMemo } from 'react';
 import { ArrowLeft, BriefcaseBusiness, CalendarDays, ChevronRight, Mail, Search, UserRound } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -18,8 +19,13 @@ function StatusBadge({ status }) { return <span className={`app-status ${STATUS_
 
 export default function AppTracking({ onNavigate, activePage = 'p6' }) {
   const { data, ready, error } = useOfficerData();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+  const [
+    { searchQuery, selectedCandidateId },
+    { setSearchQuery, setSelectedCandidateId },
+  ] = useViewState('placementOfficer', 'AppTracking', () => ({
+    searchQuery: '',
+    selectedCandidateId: null,
+  }));
   const candidates = useMemo(() => (data.users || []).filter((user) => user.role === 'candidate'), [data.users]);
   const applications = data.applications || [];
   const selectedCandidate = candidates.find((candidate) => candidate.id === selectedCandidateId);

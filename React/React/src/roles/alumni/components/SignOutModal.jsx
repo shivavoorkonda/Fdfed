@@ -1,7 +1,7 @@
-import React from 'react';
-import { clearSession } from '../../../services/api.js';
+import { useLogout } from '../../../shared/context/AuthContext.jsx';
 
 export default function SignOutModal({ isOpen, onClose, onConfirm }) {
+  const confirmSignOut = useLogout();
   if (!isOpen) return null;
 
   return (
@@ -32,8 +32,7 @@ export default function SignOutModal({ isOpen, onClose, onConfirm }) {
               if (onConfirm) {
                 onConfirm();
               } else {
-                clearSession();
-                window.location.replace('/login');
+                confirmSignOut();
               }
             }}
           >

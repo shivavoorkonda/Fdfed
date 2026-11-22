@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import { useViewState } from '../../../store/useViewState.js';
+import { useMemo } from 'react';
 import { Search, UserCheck, Sparkles, Eye } from 'lucide-react';
 import CandidateModal from './CandidateModal';
 
@@ -6,14 +7,19 @@ import CandidateModal from './CandidateModal';
  * Screening queue: only candidates who actually applied to this recruiter's
  * opportunities and are still in the "Applied" stage. Pick several and shortlist them in one go.
  */
-export default function CandidatesFilter({ applications = [], opportunities = [], onBulkShortlist, onUpdateStatus }) {
-  const [role, setRole] = useState('All Roles');
-  const [dept, setDept] = useState([]);
-  const [minCgpa, setMinCgpa] = useState('0');
-  const [referredOnly, setReferredOnly] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [viewingCandidateId, setViewingCandidateId] = useState(null);
+export default function CandidatesFilter({ applications = [], onBulkShortlist, onUpdateStatus }) {
+  const [
+    { role, dept, minCgpa, referredOnly, searchTerm, selectedIds, viewingCandidateId },
+    { setRole, setDept, setMinCgpa, setReferredOnly, setSearchTerm, setSelectedIds, setViewingCandidateId },
+  ] = useViewState('recruiter', 'CandidatesFilter', () => ({
+    role: 'All Roles',
+    dept: [],
+    minCgpa: '0',
+    referredOnly: false,
+    searchTerm: '',
+    selectedIds: [],
+    viewingCandidateId: null,
+  }));
 
   const queue = useMemo(() => applications.filter((a) => a.status === 'Applied'), [applications]);
   const roles = [...new Map(queue.map(a => [String(a.opportunityId), { id: String(a.opportunityId), label: `${a.role} (${a.jobId})` }])).values()];

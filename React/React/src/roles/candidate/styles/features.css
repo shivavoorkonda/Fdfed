@@ -6,7 +6,7 @@
     margin-bottom: 24px;
 }
 
-/* ---- Generic empty / loading states ---- */
+/* ---- Empty states ---- */
 .cn-candidate .empty-state {
     text-align: center;
     padding: 80px 20px;
@@ -32,10 +32,6 @@
     transition: background 0.2s;
 }
 .cn-candidate .empty-state a:hover { background: var(--brand-secondary); }
-
-.cn-candidate .loading-state { text-align: center; padding: 60px; color: var(--text-secondary); }
-.cn-candidate .loading-state i { font-size: 32px; margin-bottom: 12px; display: block; animation: cn-spin 1s linear infinite; }
-@keyframes cn-spin { to { transform: rotate(360deg); } }
 
 /* ---- Toast ---- */
 .cn-candidate .toast {
@@ -97,7 +93,6 @@
 .cn-candidate .tag { font-size: 11px; padding: 4px 10px; border-radius: var(--radius-full); font-weight: 600; }
 .cn-candidate .tag-blue { background: var(--blue-light); color: var(--blue-dark); }
 .cn-candidate .tag-green { background: var(--green-light); color: var(--green-dark); }
-.cn-candidate .tag-orange { background: #fef3c7; color: #92400e; }
 .cn-candidate .tag-gray { background: #f1f5f9; color: #475569; }
 
 .cn-candidate .drive-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
@@ -178,21 +173,6 @@
     background: #fff;
     box-shadow: 0 0 0 3px rgba(57, 52, 160, 0.08);
 }
-
-.cn-candidate .btn-search {
-    background: var(--brand-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: 10px 24px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: auto;
-    font-family: var(--font-sans);
-    transition: background 0.2s, box-shadow 0.2s;
-}
-.cn-candidate .btn-search:hover { background: var(--brand-secondary); box-shadow: 0 4px 12px rgba(57, 52, 160, 0.2); }
 .cn-candidate .btn-clear {
     background: transparent;
     color: var(--text-secondary);
@@ -207,58 +187,7 @@
     transition: background 0.2s;
 }
 .cn-candidate .btn-clear:hover { background: #f1f5f9; }
-
-.cn-candidate .results-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; font-weight: 500; }
-
-.cn-candidate .drives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-
-.cn-candidate .search-drive-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    padding: 22px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.cn-candidate .search-drive-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(57, 52, 160, 0.12);
-}
-
-.cn-candidate .drive-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-
-.cn-candidate .type-chip { font-size: 11px; padding: 4px 12px; border-radius: var(--radius-full); font-weight: 700; white-space: nowrap; }
-.cn-candidate .type-ft { background: var(--green-light); color: var(--green-dark); }
-.cn-candidate .type-int { background: #fef3c7; color: #92400e; }
-
-.cn-candidate .drive-meta { display: flex; flex-direction: column; gap: 5px; }
-.cn-candidate .meta-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
-.cn-candidate .meta-row span { font-weight: 600; color: var(--text-primary); }
 .cn-candidate .pkg { font-weight: 800; color: var(--green-dark); font-size: 13px; }
-.cn-candidate .deadline-warn { color: #dc2626; font-weight: 700; }
-
-.cn-candidate .dept-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-.cn-candidate .dept-tag { background: #f1f5f9; color: #475569; font-size: 11px; padding: 3px 10px; border-radius: var(--radius-full); font-weight: 500; }
-
-.cn-candidate .drive-footer { display: flex; gap: 8px; margin-top: 4px; }
-.cn-candidate .btn-apply-drive {
-    background: var(--brand-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: 9px 18px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    flex: 1;
-    font-family: var(--font-sans);
-    transition: background 0.2s;
-}
-.cn-candidate .btn-apply-drive:hover { background: var(--brand-secondary); }
 .cn-candidate .btn-save-drive {
     background: #f1f5f9;
     color: #475569;
@@ -278,71 +207,6 @@
    Interview Calendar
    ========================================================= */
 .cn-candidate .legend { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.cn-candidate .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-.cn-candidate .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-.cn-candidate .interview-list { display: flex; flex-direction: column; gap: 16px; }
-
-.cn-candidate .icard {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    padding: 22px 24px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: var(--shadow-md);
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.cn-candidate .icard:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-.cn-candidate .icard.online { border-left: 4px solid var(--brand-primary); }
-.cn-candidate .icard.offline { border-left: 4px solid #f59e0b; }
-.cn-candidate .icard.completed { opacity: 0.75; border-left: 4px solid #94a3b8; }
-.cn-candidate .icard.cancelled { opacity: 0.65; border-left: 4px solid #ef4444; }
-
-.cn-candidate .date-block {
-    min-width: 72px;
-    text-align: center;
-    background: #f8fafc;
-    border-radius: var(--radius-md);
-    padding: 12px 8px;
-    flex-shrink: 0;
-    border: 1px solid #e2e8f0;
-}
-.cn-candidate .date-day { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1; }
-.cn-candidate .date-mon { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-
-.cn-candidate .icard-info { flex: 1; }
-.cn-candidate .icard-title { font-weight: 700; font-size: 15px; color: var(--text-primary); }
-.cn-candidate .icard-company { font-size: 13px; color: var(--brand-primary); font-weight: 600; margin-bottom: 10px; }
-.cn-candidate .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
-.cn-candidate .meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
-.cn-candidate .meta-item span { font-weight: 600; color: var(--text-primary); }
-
-.cn-candidate .ibadge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; }
-.cn-candidate .badge-online { background: var(--blue-light); color: var(--blue-dark); }
-.cn-candidate .badge-offline { background: #fef3c7; color: #92400e; }
-.cn-candidate .badge-completed { background: var(--green-light); color: var(--green-dark); }
-.cn-candidate .badge-cancelled { background: var(--pink-light); color: var(--pink-dark); }
-.cn-candidate .badge-scheduled { background: #f0fdf4; color: #15803d; }
-
-.cn-candidate .round-chip { background: #f1f5f9; color: #475569; font-size: 11px; padding: 3px 10px; border-radius: var(--radius-full); font-weight: 600; }
-
-.cn-candidate .link-area { margin-top: 10px; }
-.cn-candidate .meet-link {
-    font-size: 12px;
-    color: var(--brand-primary);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 14px;
-    border: 1px solid rgba(57, 52, 160, 0.2);
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    transition: background 0.2s;
-}
-.cn-candidate .meet-link:hover { background: rgba(57, 52, 160, 0.05); }
 
 /* =========================================================
    Application Tracker

@@ -1,11 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useViewState } from '../../../store/useViewState.js';
+import { useCallback, useEffect } from "react";
 import api, { errorMessage } from "../../../services/api.js";
 
 export default function ActivityLog() {
-  const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [query, setQuery] = useState("");
+  const [
+    { entries, loading, error, query },
+    { setEntries, setLoading, setError, setQuery },
+  ] = useViewState('collegeAdmin', 'ActivityLog', () => ({
+    entries: [],
+    loading: true,
+    error: "",
+    query: "",
+  }));
   const load = useCallback(async () => {
     try {
       const { data } = await api.get("/activity/placement-officers");
